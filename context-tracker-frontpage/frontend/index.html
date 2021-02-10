@@ -1,0 +1,37 @@
+<html>
+<link type="text/css" rel="stylesheet" media="all" href="frontpage.css">
+
+<script src="main.js"></script>
+
+<body>
+
+    <div id="navigation">
+      <ul>
+        <li><a href="http://localhost:8080">CraigsMatrix</a></li>
+        <li><a href="http://localhost:631">CUPS</a></li>
+      </ul>
+    </div>
+
+    <div id="git-global-view">
+      <h3> Git Global View </h3>
+      <ul>
+        <li> journal </li>
+        <li> notes </li>
+      </ul>
+    </div>
+
+    <div id="last-filesystem-events">
+      <h3> Last Filesystem Events </h3>
+    </div>
+
+
+    <div id="context-viewer-test">aye elm</div>
+    <script>
+     var app = Elm.Main.init({
+         node: document.getElementById('context-viewer-test')
+     });
+    </script>
+
+</body>
+
+</html>
