@@ -2,6 +2,7 @@
 <link type="text/css" rel="stylesheet" media="all" href="frontpage.css">
 
 <script src="context-viewer/contextviewer.js"></script>
+<script src="context-summary/contextsummary.js"></script>
 
 <body>
 
@@ -23,6 +24,13 @@
     <div id="last-filesystem-events">
       <h3> Last Filesystem Events </h3>
     </div>
+
+    <div id="context-summary">aye elm</div>
+    <script>
+     var app = Elm.ContextSummary.init({
+         node: document.getElementById('context-summary')
+     });
+    </script>
 
 
     <div id="context-viewer-test">aye elm</div>

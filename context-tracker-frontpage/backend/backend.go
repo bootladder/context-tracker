@@ -18,27 +18,39 @@ func main() {
 
 	router.ServeFiles("/*filepath", http.Dir("../frontend"))
 	router.POST("/api/", gitStatusHandler)
+	router.POST("/api/contextlist", contextListHandler)
 
 	fmt.Println("Serving on 9090")
 	http.ListenAndServe(":9090", router)
 }
 
-// Handler
+func contextListHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	stdout := shellout("./context-list.sh")
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte((stdout)))
+}
+
 func gitStatusHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
-	// go to the file storage of this context
-	// run git status
-	cmd := exec.Command("./context-gitstatus.sh", "test")
+	stdout := shellout("./context-gitstatus.sh")
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte((stdout)))
+}
+
+func shellout(str string) string {
+	cmd := exec.Command(str, "test")
 	stdout, err := cmd.Output()
 
     if err != nil {
         fmt.Println(err.Error())
-        return
+        return "fail to shellout"
     }
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte((string(stdout))))
+	return string(stdout)
 }
 
 
