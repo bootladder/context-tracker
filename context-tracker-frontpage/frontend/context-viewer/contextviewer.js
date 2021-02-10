@@ -4530,11 +4530,11 @@ function _Browser_load(url)
 		}
 	}));
 }
-var author$project$Main$Model = F2(
+var author$project$ContextViewer$Model = F2(
 	function (debugBreadcrumb, gitStatus) {
 		return {debugBreadcrumb: debugBreadcrumb, gitStatus: gitStatus};
 	});
-var author$project$Main$ReceivedGitStatus = function (a) {
+var author$project$ContextViewer$ReceivedGitStatus = function (a) {
 	return {$: 'ReceivedGitStatus', a: a};
 };
 var elm$core$Result$Ok = function (a) {
@@ -5885,27 +5885,27 @@ var elm$http$Http$post = function (r) {
 		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: elm$core$Maybe$Nothing, tracker: elm$core$Maybe$Nothing, url: r.url});
 };
 var elm$http$Http$stringBody = _Http_pair;
-var author$project$Main$httpRequestGitStatus = elm$http$Http$post(
+var author$project$ContextViewer$httpRequestGitStatus = elm$http$Http$post(
 	{
 		body: A2(elm$http$Http$stringBody, 'hello', 'wtf'),
-		expect: elm$http$Http$expectString(author$project$Main$ReceivedGitStatus),
+		expect: elm$http$Http$expectString(author$project$ContextViewer$ReceivedGitStatus),
 		url: 'http://localhost:9090/api/'
 	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
-var author$project$Main$init = function (_n0) {
+var author$project$ContextViewer$init = function (_n0) {
 	return _Utils_Tuple2(
-		A2(author$project$Main$Model, 'dummy debug', 'dummy status'),
+		A2(author$project$ContextViewer$Model, 'dummy debug', 'dummy status'),
 		elm$core$Platform$Cmd$batch(
 			_List_fromArray(
-				[author$project$Main$httpRequestGitStatus])));
+				[author$project$ContextViewer$httpRequestGitStatus])));
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
-var author$project$Main$subscriptions = function (model) {
+var author$project$ContextViewer$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
 };
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var author$project$Main$update = F2(
+var author$project$ContextViewer$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'Hello') {
 			var a = msg.a;
@@ -5953,7 +5953,7 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
-var author$project$Main$view = function (model) {
+var author$project$ContextViewer$view = function (model) {
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
@@ -6208,7 +6208,7 @@ var elm$url$Url$fromString = function (str) {
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$element = _Browser_element;
-var author$project$Main$main = elm$browser$Browser$element(
-	{init: author$project$Main$init, subscriptions: author$project$Main$subscriptions, update: author$project$Main$update, view: author$project$Main$view});
-_Platform_export({'Main':{'init':author$project$Main$main(
+var author$project$ContextViewer$main = elm$browser$Browser$element(
+	{init: author$project$ContextViewer$init, subscriptions: author$project$ContextViewer$subscriptions, update: author$project$ContextViewer$update, view: author$project$ContextViewer$view});
+_Platform_export({'ContextViewer':{'init':author$project$ContextViewer$main(
 	elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));

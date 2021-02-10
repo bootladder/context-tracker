@@ -1,4 +1,4 @@
-module Main exposing (..)
+module ContextViewer exposing (..)
 
 import Browser
 import Html exposing (..)
