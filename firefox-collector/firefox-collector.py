@@ -41,7 +41,7 @@ if False:
 
 
 # Get the Rows
-cursor = conn.execute("SELECT * from moz_places ORDER BY id desc limit 4")
+cursor = conn.execute("SELECT * from moz_places ORDER BY id desc limit 10")
 outputrows = []
 for row in cursor:
   thisoutputrow = dict()
