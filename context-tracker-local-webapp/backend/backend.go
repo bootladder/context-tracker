@@ -22,9 +22,19 @@ func main() {
   // Serve the API
 	router.POST("/api/", gitStatusHandler)
 	router.POST("/api/contextlist", contextListHandler)
+	router.POST("/api/shellhistory", shellHistoryHandler)
 
 	fmt.Println("Serving on 9999")
 	http.ListenAndServe(":9999", router)
+}
+
+
+func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	stdout := shellout("/opt/projects/context-tracker/ash-collector/ash_collector.py")
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte((stdout)))
 }
 
 func contextListHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {

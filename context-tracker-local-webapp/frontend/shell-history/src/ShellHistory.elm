@@ -8,6 +8,7 @@ import Html.Events exposing (..)
 import Http
 
 import String
+import Json.Decode exposing (..)
 
 
 -- MAIN
@@ -29,6 +30,7 @@ main =
 type alias Model =
     { debugBreadcrumb : String
     , gitStatus : String
+    , rows : List (List (String))
     }
 
 
@@ -41,7 +43,8 @@ init _ =
     ( Model
           "dummy debug"
           "dummy status"
-    , Cmd.batch [(httpRequestGitStatus)]
+          []
+    , Cmd.batch [(httpRequestShellHistory)]
     )
 
 
@@ -51,7 +54,7 @@ init _ =
 
 type Msg
     = Hello Int
-    | ReceivedGitStatus (Result Http.Error (String))
+    | ReceivedShellHistory (Result Http.Error (List (List (String))))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -63,10 +66,10 @@ update msg model =
             , Cmd.none
             )
 
-        ReceivedGitStatus result ->
+        ReceivedShellHistory result ->
             case result of
                 Ok status ->
-                    ( {model | gitStatus = status}, Cmd.none )
+                    ( {model | rows = status}, Cmd.none )
                 Err e -> (model, Cmd.none)
 
 -- SUBSCRIPTIONS
@@ -80,25 +83,37 @@ subscriptions model =
 
 -- VIEW
 
+renderShellHistoryRow : List (String) -> Html Msg
+renderShellHistoryRow mystr =
+    div [id "hello"] [text "myshellrow"]
+  
+    
 
 view : Model -> Html Msg
 view model =
     div [id "container"] 
-    [ h2 [] [text "Hurr durr title"]
-    , div [] [text model.gitStatus]
-    , div [] [text "filesystem events"]
-    , div [] [text "shell commands"]
-    ]
+    (List.append
+      [ h2 [] [text "Hurr durr title"]
+      , div [] [text model.gitStatus]
+      ]
+
+      (List.map renderShellHistoryRow model.rows)
+    )
 
 
 
 -- HTTP
 
-httpRequestGitStatus : Cmd Msg
-httpRequestGitStatus =
+httpRequestShellHistory : Cmd Msg
+httpRequestShellHistory =
     Http.post
         { body =
             (Http.stringBody "hello" "wtf")
-        , url = "http://localhost:9999/api/"
-        , expect = Http.expectString ReceivedGitStatus
+        , url = "http://localhost:9999/api/shellhistory"
+        , expect = Http.expectJson ReceivedShellHistory shellHistoryDecoder
         }
+
+
+shellHistoryDecoder : Decoder (List (List (String)))
+shellHistoryDecoder =
+    Json.Decode.list (Json.Decode.list string)
