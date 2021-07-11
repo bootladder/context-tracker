@@ -38,6 +38,6 @@ for row in cursor:
 conn.close()
 
 
-print(json.dumps(outputrows))
+print(json.dumps(outputrows, indent=2))
 #for outputrow in outputrows:
 #  print(outputrow)
