@@ -99,6 +99,6 @@ httpRequestGitStatus =
     Http.post
         { body =
             (Http.stringBody "hello" "wtf")
-        , url = "http://localhost:9090/api/"
+        , url = "http://localhost:9999/api/"
         , expect = Http.expectString ReceivedGitStatus
         }

@@ -16,12 +16,15 @@ func main() {
 
 	router := httprouter.New()
 
+  // Serve the Frontend
 	router.ServeFiles("/*filepath", http.Dir("../frontend"))
+
+  // Serve the API
 	router.POST("/api/", gitStatusHandler)
 	router.POST("/api/contextlist", contextListHandler)
 
-	fmt.Println("Serving on 9090")
-	http.ListenAndServe(":9090", router)
+	fmt.Println("Serving on 9999")
+	http.ListenAndServe(":9999", router)
 }
 
 func contextListHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
