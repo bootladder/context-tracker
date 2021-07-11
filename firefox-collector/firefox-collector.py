@@ -12,7 +12,7 @@ import glob
 import sys
 from shutil import copyfile
 
-path_to_firefox_history_db = "/home/steve/.mozilla/firefox/*default*/places.sqlite"
+path_to_firefox_history_db = "/home/*/.mozilla/firefox/*default*/places.sqlite"
 shadow_db_location = "/tmp/firefoxshadow.sqlite"
 
 globresult = glob.glob(path_to_firefox_history_db)

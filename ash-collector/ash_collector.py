@@ -12,9 +12,21 @@
 # By default it will be the last 100 (10 for now, testing) shell commands
 
 import sqlite3
+import glob
 import json
+from shutil import copyfile
 
-conn = sqlite3.connect('/home/steve/.ash/history.db')
+path_to_ash_db = "/home/*/.ash/history.db"
+shadow_db_location = "/tmp/ashshadow.sqlite"
+
+globresult = glob.glob(path_to_ash_db)
+if len(globresult) != 1:
+  print("wtf too many globs")
+  sys.exit(1)
+
+
+dbfilename = globresult[0]
+conn = sqlite3.connect(dbfilename)
 
 # want to look at schema? for testing only
 if False:
