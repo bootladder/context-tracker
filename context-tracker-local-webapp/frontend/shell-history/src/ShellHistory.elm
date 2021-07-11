@@ -88,23 +88,34 @@ subscriptions model =
 
 renderShellHistoryRow : ShellHistoryRow -> Html Msg
 renderShellHistoryRow row =
-  div [] [
-            div [id "hello"] [text "fucking elm parsing time"]
-          , div [id "hello"] [text row.cwd]
-          , div [id "hello"] [text row.command]
+      tr []
+          [
+            td [id "hello"] [text "fucking elm parsing time"]
+          , td [id "hello"] [text row.cwd]
+          , td [id "hello"] [text row.command]
           ]
+      
   
+renderShellHistoryTable : List (ShellHistoryRow) -> Html Msg
+renderShellHistoryTable rows = 
+    table [class "table"]
+      [
+        tbody [] 
+          (List.map renderShellHistoryRow rows)
+      ]
+
+
     
 
 view : Model -> Html Msg
 view model =
     div [id "container"] 
     (List.append
-      [ h2 [] [text "Hurr durr title"]
-      , div [] [text model.gitStatus]
+      [ h2 [] [text "Shell History"]
       ]
-
-      (List.map renderShellHistoryRow model.rows)
+      
+      [(renderShellHistoryTable model.rows)
+      ]
     )
 
 
