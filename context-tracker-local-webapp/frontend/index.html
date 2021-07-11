@@ -7,6 +7,7 @@
 
 <script src="context-viewer/contextviewer.js"></script>
 <script src="context-summary/contextsummary.js"></script>
+<script src="shell-history/shellhistory.js"></script>
 
 <body>
     <!-- Main jumbotron for a primary marketing message or call to action -->
@@ -21,8 +22,16 @@
       <!-- Example row of columns -->
       <div class="row">
           <div class="col-md-4">
-            <div class="elm-app-left">
+            <div id="elm-app-left">
               hello
+
+                <script>
+                 var app = Elm.ShellHistory.init({
+                     node: document.getElementById('elm-app-left')
+                 });
+                </script>
+
+
             </div>
           </div>
           <div class="col-md-4">
