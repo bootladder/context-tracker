@@ -9,6 +9,7 @@ import Http
 
 import String
 import Json.Decode exposing (..)
+import Time exposing (..)
 
 
 -- MAIN
@@ -30,7 +31,7 @@ main =
 type alias Model =
     { debugBreadcrumb : String
     , gitStatus : String
-    , rows : List (List (String))
+    , rows : List (ShellHistoryRow)
     }
 
 
@@ -54,7 +55,7 @@ init _ =
 
 type Msg
     = Hello Int
-    | ReceivedShellHistory (Result Http.Error (List (List (String))))
+    | ReceivedShellHistory (Result Http.Error (List (ShellHistoryRow)))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -70,7 +71,9 @@ update msg model =
             case result of
                 Ok status ->
                     ( {model | rows = status}, Cmd.none )
-                Err e -> (model, Cmd.none)
+
+                Err e -> 
+                    ( {model | rows = [ShellHistoryRow 1 "blah" "blah"]}, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -83,9 +86,13 @@ subscriptions model =
 
 -- VIEW
 
-renderShellHistoryRow : List (String) -> Html Msg
-renderShellHistoryRow mystr =
-    div [id "hello"] [text "myshellrow"]
+renderShellHistoryRow : ShellHistoryRow -> Html Msg
+renderShellHistoryRow row =
+  div [] [
+            div [id "hello"] [text "fucking elm parsing time"]
+          , div [id "hello"] [text row.cwd]
+          , div [id "hello"] [text row.command]
+          ]
   
     
 
@@ -114,6 +121,19 @@ httpRequestShellHistory =
         }
 
 
-shellHistoryDecoder : Decoder (List (List (String)))
+type alias ShellHistoryRow = 
+  { starttime : Int
+  , command : String
+  , cwd : String
+  }
+
+shellHistoryDecoder : Decoder (List ShellHistoryRow)
 shellHistoryDecoder =
-    Json.Decode.list (Json.Decode.list string)
+    Json.Decode.list (shellHistoryRowDecoder)
+
+shellHistoryRowDecoder : Decoder ShellHistoryRow
+shellHistoryRowDecoder =
+    map3 ShellHistoryRow
+        (field "starttime" int)
+        (field "command" string)
+        (field "cwd" string)

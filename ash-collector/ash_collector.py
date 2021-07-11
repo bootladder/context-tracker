@@ -43,7 +43,7 @@ outputrows = []
 for row in cursor:
   thisoutputrow = dict()
   thisoutputrow['cwd']         = row[6]
-  thisoutputrow['startime']    = row[8]
+  thisoutputrow['starttime']    = row[8]
   thisoutputrow['command']     = row[13]
   outputrows.append(thisoutputrow)
 
