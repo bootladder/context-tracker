@@ -5,6 +5,11 @@ pushd frontend
   ./runner.sh
   popd
 
+  pushd firefox-history
+  echo $(pwd)
+  ./runner.sh
+  popd
+
   pushd context-summary
   echo $pwd
   ./runner.sh

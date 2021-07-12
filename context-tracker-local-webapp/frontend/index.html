@@ -8,6 +8,7 @@
 <script src="context-viewer/contextviewer.js"></script>
 <script src="context-summary/contextsummary.js"></script>
 <script src="shell-history/shellhistory.js"></script>
+<script src="firefox-history/firefoxhistory.js"></script>
 
 <body>
     <!-- Main jumbotron for a primary marketing message or call to action -->
@@ -39,7 +40,7 @@
               hello
 
                 <script>
-                 var app = Elm.ContextSummary.init({
+                 var app = Elm.FirefoxHistory.init({
                      node: document.getElementById('elm-app-mid')
                  });
                 </script>
@@ -75,6 +76,20 @@
 
 
       <div class="row">
+
+          <div class="col-md-4">
+            <div id="elm-app-blah">
+              hello
+
+                <script>
+                 var app = Elm.ContextSummary.init({
+                     node: document.getElementById('elm-app-blah')
+                 });
+                </script>
+
+            </div>
+          </div>
+
       </div>
  </div>
 
