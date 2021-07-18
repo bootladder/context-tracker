@@ -7,10 +7,10 @@ import Html.Events exposing (..)
 
 import Http
 
-import String
+import String exposing (..)
 import Json.Decode exposing (..)
 import Time exposing (..)
-
+import Date exposing (..)
 
 -- MAIN
 
@@ -35,6 +35,7 @@ type alias Model =
 
 
 -- INIT
+dummyPosixTime = Time.millisToPosix 0
 
 
 init : () -> ( Model, Cmd Msg )
@@ -74,7 +75,7 @@ update msg model =
                     let
                       _ = Debug.log "error is " e
                     in
-                      ( {model | rows = [FirefoxHistoryRow 1 "blahurl" (Just "blahtitle") (Just "blahdesc")]}, Cmd.none)
+                      ( {model | rows = [FirefoxHistoryRow dummyPosixTime "blahurl" (Just "blahtitle") (Just "blahdesc")]}, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -87,19 +88,34 @@ subscriptions model =
 
 -- VIEW
 
+
+
+posixToHourMinSec : Time.Zone -> Time.Posix -> String
+posixToHourMinSec zone posix =
+       (String.padLeft 2 '0' <| String.fromInt <| Time.toHour zone posix)
+    ++ ":"
+    ++ (String.padLeft 2 '0' <| String.fromInt <| Time.toMinute zone posix)
+    ++ ":"
+    ++ (String.padLeft 2 '0' <| String.fromInt <| Time.toSecond zone posix)
+
+timestampString : Time.Posix -> String
+timestampString time = (Date.format "y-MM-d " <| (Date.fromPosix utc time))
+                ++  (posixToHourMinSec utc time)
+
+
 renderFirefoxHistoryRow : FirefoxHistoryRow -> Html Msg
 renderFirefoxHistoryRow row =
-      tr []
-          [
-            td [id "hello"] [text "fucking elm parsing time"]
-          , td [id "hello"] [text row.url]
-          , td [id "hello"] [
-                              (case row.title of
-                                 Just a -> text a
-                                 Nothing -> text "nothing"
-                              )
-                            ]
-          ]
+    tr []
+        [
+        td [id "hello"] [text <| timestampString row.last_visit_date]
+        , td [id "hello"] [text row.url]
+        , td [id "hello"] [
+                            (case row.title of
+                                Just a -> text a
+                                Nothing -> text "nothing"
+                            )
+                        ]
+        ]
       
   
 renderFirefoxHistoryTable : List (FirefoxHistoryRow) -> Html Msg
@@ -139,11 +155,22 @@ httpRequestFirefoxHistory =
 
 
 type alias FirefoxHistoryRow = 
-  { last_visit_date : Int
+  { last_visit_date : Time.Posix
   , url : String
   , title : Maybe String
   , description: Maybe String
   }
+
+
+-- PAY ATTENTION TO MICROS OR MILLIS OR SECS
+decodePosixTime : Decoder Time.Posix
+decodePosixTime =
+    int
+        |> andThen
+            (\ms ->
+                succeed <| Time.millisToPosix <| round ((Basics.toFloat ms) / 1000.0) 
+            )
+
 
 firefoxHistoryDecoder : Decoder (List FirefoxHistoryRow)
 firefoxHistoryDecoder =
@@ -152,7 +179,7 @@ firefoxHistoryDecoder =
 firefoxHistoryRowDecoder : Decoder FirefoxHistoryRow
 firefoxHistoryRowDecoder =
     map4 FirefoxHistoryRow
-        (field "last_visit_date" int)
+        (field "last_visit_date" decodePosixTime)
         (field "url" string)
         (maybe <| field "title" string)
         (maybe <| field "description" string)

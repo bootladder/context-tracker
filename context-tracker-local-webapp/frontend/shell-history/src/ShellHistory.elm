@@ -10,7 +10,7 @@ import Http
 import String
 import Json.Decode exposing (..)
 import Time exposing (..)
-
+import Date
 
 -- MAIN
 
@@ -37,6 +37,7 @@ type alias Model =
 
 -- INIT
 
+dummyPosixTime = Time.millisToPosix 0
 
 init : () -> ( Model, Cmd Msg )
 init _ =
@@ -73,7 +74,7 @@ update msg model =
                     ( {model | rows = status}, Cmd.none )
 
                 Err e -> 
-                    ( {model | rows = [ShellHistoryRow 1 "blah" "blah"]}, Cmd.none)
+                    ( {model | rows = [ShellHistoryRow dummyPosixTime "blah" "blah"]}, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -86,14 +87,28 @@ subscriptions model =
 
 -- VIEW
 
+
+posixToHourMinSec : Time.Zone -> Time.Posix -> String
+posixToHourMinSec zone posix =
+       (String.padLeft 2 '0' <| String.fromInt <| Time.toHour zone posix)
+    ++ ":"
+    ++ (String.padLeft 2 '0' <| String.fromInt <| Time.toMinute zone posix)
+    ++ ":"
+    ++ (String.padLeft 2 '0' <| String.fromInt <| Time.toSecond zone posix)
+
+
+timestampString : Time.Posix -> String
+timestampString time = (Date.format "y-MM-d " <| (Date.fromPosix utc time))
+                ++ (posixToHourMinSec utc time)
+
 renderShellHistoryRow : ShellHistoryRow -> Html Msg
 renderShellHistoryRow row =
-      tr []
-          [
-            td [id "hello"] [text "fucking elm parsing time"]
-          , td [id "hello"] [text row.cwd]
-          , td [id "hello"] [text row.command]
-          ]
+    tr []
+        [
+        td [id "hello"] [text <| timestampString row.starttime]
+        , td [id "hello"] [text row.cwd]
+        , td [id "hello"] [text row.command]
+        ]
       
   
 renderShellHistoryTable : List (ShellHistoryRow) -> Html Msg
@@ -103,8 +118,6 @@ renderShellHistoryTable rows =
         tbody [] 
           (List.map renderShellHistoryRow rows)
       ]
-
-
     
 
 view : Model -> Html Msg
@@ -133,10 +146,18 @@ httpRequestShellHistory =
 
 
 type alias ShellHistoryRow = 
-  { starttime : Int
+  { starttime : Time.Posix
   , command : String
   , cwd : String
   }
+
+decodePosixTime : Decoder Time.Posix
+decodePosixTime =
+    int
+        |> andThen
+            (\ms ->
+                succeed <| Time.millisToPosix (ms * 1000)
+            )
 
 shellHistoryDecoder : Decoder (List ShellHistoryRow)
 shellHistoryDecoder =
@@ -145,6 +166,6 @@ shellHistoryDecoder =
 shellHistoryRowDecoder : Decoder ShellHistoryRow
 shellHistoryRowDecoder =
     map3 ShellHistoryRow
-        (field "starttime" int)
+        (field "starttime" decodePosixTime)
         (field "command" string)
         (field "cwd" string)
