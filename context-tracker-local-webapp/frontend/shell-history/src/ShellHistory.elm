@@ -119,12 +119,22 @@ renderShellHistoryTable rows =
           (List.map renderShellHistoryRow rows)
       ]
     
+renderHeader : Model -> Html Msg
+renderHeader model = 
+    div [] [
+            h2 [] [text "Shell History"]    
+            , div [] [
+                
+            ]
+            ]
+    
 
 view : Model -> Html Msg
 view model =
-    div [id "container"] 
+    div [id "shell-history-container"
+        , class "bg-light" ] 
     (List.append
-      [ h2 [] [text "Shell History"]
+      [ renderHeader model
       ]
       
       [(renderShellHistoryTable model.rows)
