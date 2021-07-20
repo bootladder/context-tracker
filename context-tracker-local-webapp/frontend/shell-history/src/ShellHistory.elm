@@ -64,6 +64,7 @@ type Msg
     = Hello Int
     | ReceivedShellHistory (Result Http.Error (List ShellHistoryRow))
     | SearchButtonClicked
+    | SearchInputHappened String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -84,6 +85,9 @@ update msg model =
 
         SearchButtonClicked ->
             ( model, Cmd.batch [ httpRequestShellHistoryWithSearch model.searchquerystring ] )
+
+        SearchInputHappened str ->
+            ( { model | searchquerystring = str }, Cmd.none )
 
 
 
@@ -136,7 +140,7 @@ renderHeader model =
     div []
         [ h2 [] [ text "Shell History" ]
         , div []
-            [ input [] []
+            [ input [ onInput SearchInputHappened ] []
             , button [ onClick SearchButtonClicked ] [ text "search" ]
             , span [] [ text "spaceer" ]
             , button [] [ text "<" ]
