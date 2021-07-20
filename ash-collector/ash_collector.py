@@ -53,6 +53,7 @@ if searchquery == "":
   cursor = conn.execute("SELECT * from commands ORDER BY id desc limit 10")
 else:
   sqlcommand = "SELECT * from commands where command LIKE \"%%%s%%\" ORDER BY id desc limit 10" % searchquery
+  # print(sqlcommand)
   cursor = conn.execute(sqlcommand)
 
 

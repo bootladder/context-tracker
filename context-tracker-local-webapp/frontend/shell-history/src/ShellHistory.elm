@@ -203,7 +203,7 @@ httpRequestShellHistoryWithSearch : String -> Cmd Msg
 httpRequestShellHistoryWithSearch querystr =
     let
         jsonBody =
-            "{ \"searchquery\" : \" "
+            "{ \"searchquery\" : \""
                 ++ querystr
                 ++ "\"}"
     in
