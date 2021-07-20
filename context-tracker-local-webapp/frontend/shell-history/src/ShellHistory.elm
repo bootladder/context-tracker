@@ -9,6 +9,7 @@ import Html.Events exposing (..)
 import Http
 import Json.Decode exposing (..)
 import String exposing (..)
+import Task exposing (perform)
 import Time exposing (..)
 
 
@@ -35,6 +36,7 @@ type alias Model =
     , rows : List ShellHistoryRow
     , searchquerystring : String
     , searchsizeint : Int
+    , localtimezone : Zone
     }
 
 
@@ -56,8 +58,10 @@ init _ =
         ""
         -- querystring
         10
-      -- search size
-    , Cmd.batch [ httpRequestShellHistory ]
+        -- search size
+        utc
+      --zone
+    , Cmd.batch [ httpRequestShellHistory, getLocalTimeZone ]
     )
 
 
@@ -71,6 +75,7 @@ type Msg
     | SearchButtonClicked
     | SearchInputHappened String
     | SearchSizeInputHappened String
+    | GotTimeZone Zone
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -108,6 +113,9 @@ update msg model =
             , Cmd.none
             )
 
+        GotTimeZone z ->
+            ( { model | localtimezone = z }, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
@@ -131,26 +139,26 @@ posixToHourMinSec zone posix =
         ++ (String.padLeft 2 '0' <| String.fromInt <| Time.toSecond zone posix)
 
 
-timestampString : Time.Posix -> String
-timestampString time =
-    (Date.format "y-MM-d " <| Date.fromPosix utc time)
-        ++ posixToHourMinSec utc time
+timestampString : Time.Posix -> Time.Zone -> String
+timestampString time zone =
+    (Date.format "y-MM-d " <| Date.fromPosix zone time)
+        ++ posixToHourMinSec zone time
 
 
-renderShellHistoryRow : ShellHistoryRow -> Html Msg
-renderShellHistoryRow row =
+renderShellHistoryRow : ShellHistoryRow -> Time.Zone -> Html Msg
+renderShellHistoryRow row zone =
     tr []
-        [ td [ id "hello" ] [ text <| timestampString row.starttime ]
+        [ td [ id "hello" ] [ text <| timestampString row.starttime zone ]
         , td [ id "hello" ] [ text row.cwd ]
         , td [ id "hello" ] [ text row.command ]
         ]
 
 
-renderShellHistoryTable : List ShellHistoryRow -> Html Msg
-renderShellHistoryTable rows =
+renderShellHistoryTable : List ShellHistoryRow -> Time.Zone -> Html Msg
+renderShellHistoryTable rows zone =
     table [ class "table" ]
         [ tbody []
-            (List.map renderShellHistoryRow rows)
+            (List.map (\row -> renderShellHistoryRow row zone) rows )
         ]
 
 
@@ -180,7 +188,7 @@ view model =
         (List.append
             [ renderHeader model
             ]
-            [ renderShellHistoryTable model.rows
+            [ renderShellHistoryTable model.rows model.localtimezone
             ]
         )
 
@@ -242,3 +250,8 @@ shellHistoryRowDecoder =
         (field "starttime" decodePosixTime)
         (field "command" string)
         (field "cwd" string)
+
+
+getLocalTimeZone : Cmd Msg
+getLocalTimeZone =
+    Task.perform GotTimeZone Time.here
