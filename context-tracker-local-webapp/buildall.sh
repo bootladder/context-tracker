@@ -19,6 +19,11 @@ pushd frontend
   echo $pwd
   ./runner.sh
   popd
+
+  pushd local-system-status
+  echo $pwd
+  ./runner.sh
+  popd
 popd
 
 pushd backend

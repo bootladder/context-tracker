@@ -10,6 +10,7 @@
 <script src="context-summary/contextsummary.js"></script>
 <script src="shell-history/shellhistory.js"></script>
 <script src="firefox-history/firefoxhistory.js"></script>
+<script src="local-system-status/localsystemstatus.js"></script>
 
 <style>
   /* These are technically the same, but use both */
@@ -41,6 +42,16 @@
     <div class="container">
       <h1>Static Jumbotron</h1>
       <p>TBD frontend this</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="elm-app-top">
+      <script>
+        var app = Elm.LocalSystemStatus.init({
+          node: document.getElementById('elm-app-top')
+        })
+      </script>
     </div>
   </div>
 
