@@ -33,12 +33,15 @@ func main() {
 	http.ListenAndServe(":9999", router)
 }
 
-func firefoxHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	stdout := shellout("/opt/projects/context-tracker/firefox-collector/firefox-collector.py")
-
+func jsonHttpResponse(w http.ResponseWriter, body string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte((stdout)))
+	w.Write([]byte((body)))
+}
+
+func firefoxHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	stdout := shellout("/opt/projects/context-tracker/firefox-collector/firefox-collector.py")
+	jsonHttpResponse(w, stdout)
 }
 
 func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -61,27 +64,19 @@ func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 	}
 
 	fmt.Printf("The command is %s\n", command)
+	fmt.Printf("The stdout is %s\n", stdout)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte((stdout)))
+	jsonHttpResponse(w, stdout)
 }
 
 func contextListHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	stdout := shellout("./context-list.sh")
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte((stdout)))
+	jsonHttpResponse(w, stdout)
 }
 
 func gitStatusHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-
 	stdout := shellout("./context-gitstatus.sh")
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte((stdout)))
+	jsonHttpResponse(w, stdout)
 }
 
 func shellout(str string) string {
@@ -102,7 +97,7 @@ func shellout_onearg(str string, arg string) string {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		return "fail to shellout"
+		return "fail to shellout: " + err.Error()
 	}
 
 	return string(stdout)

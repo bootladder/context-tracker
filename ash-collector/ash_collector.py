@@ -11,6 +11,8 @@
 
 # By default it will be the last 100 (10 for now, testing) shell commands
 
+# TODO PRINT LOGS TO STDERR OR ELSEWHERE
+
 import sqlite3
 import glob
 import json
@@ -20,12 +22,9 @@ import sys
 searchquery = ""
 
 if len(sys.argv) > 1:
-  print("i have an argument")
-  print("is %s" % sys.argv[1])
+  # print("i have an argument")
+  # print("is %s" % sys.argv[1])
   searchquery = sys.argv[1]
-
-print("WTF")
-print("SELECT * from commands where command LIKE %s ORDER BY id desc limit 10" % searchquery)
 
 
 path_to_ash_db = "/home/*/.ash/history.db"
@@ -53,7 +52,8 @@ if False:
 if searchquery == "":
   cursor = conn.execute("SELECT * from commands ORDER BY id desc limit 10")
 else:
-  cursor = conn.execute("SELECT * from commands where command LIKE %s ORDER BY id desc limit 10" % searchquery)
+  sqlcommand = "SELECT * from commands where command LIKE \"%%%s%%\" ORDER BY id desc limit 10" % searchquery
+  cursor = conn.execute(sqlcommand)
 
 
 outputrows = []
