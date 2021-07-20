@@ -2,12 +2,13 @@ module ShellHistory exposing (..)
 
 import Browser
 import Date
+import Debug exposing (toString)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode exposing (..)
-import String
+import String exposing (..)
 import Time exposing (..)
 
 
@@ -33,6 +34,7 @@ type alias Model =
     , gitStatus : String
     , rows : List ShellHistoryRow
     , searchquerystring : String
+    , searchsizeint : Int
     }
 
 
@@ -51,7 +53,10 @@ init _ =
         "dummy debug"
         "dummy status"
         []
-        "git"
+        ""
+        -- querystring
+        10
+      -- search size
     , Cmd.batch [ httpRequestShellHistory ]
     )
 
@@ -65,6 +70,7 @@ type Msg
     | ReceivedShellHistory (Result Http.Error (List ShellHistoryRow))
     | SearchButtonClicked
     | SearchInputHappened String
+    | SearchSizeInputHappened String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -88,6 +94,19 @@ update msg model =
 
         SearchInputHappened str ->
             ( { model | searchquerystring = str }, Cmd.none )
+
+        SearchSizeInputHappened str ->
+            ( { model
+                | searchsizeint =
+                    case String.toInt str of
+                        Just i ->
+                            i
+
+                        Nothing ->
+                            10
+              }
+            , Cmd.none
+            )
 
 
 
@@ -142,10 +161,12 @@ renderHeader model =
         , div []
             [ input [ onInput SearchInputHappened ] []
             , button [ onClick SearchButtonClicked ] [ text "search" ]
-            , span [] [ text "spaceer" ]
+            , span [] [ text "spacer" ]
             , button [] [ text "<" ]
             , span [] [ text "10/20" ]
             , button [] [ text ">" ]
+            , span [] [ text "spacer" ]
+            , input [ onInput SearchSizeInputHappened, Html.Attributes.value <| toString model.searchsizeint ] []
             ]
         ]
 
