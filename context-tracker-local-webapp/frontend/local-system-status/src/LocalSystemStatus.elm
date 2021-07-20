@@ -31,7 +31,7 @@ main =
 
 
 type alias Model =
-    { 
+    { ramusagegigs : Float
     }
 
 
@@ -44,6 +44,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     -- The initial model comes from a Request, now it is hard coded
     ( Model
+    3.2
     , Cmd.batch [  ]
     )
 
@@ -80,6 +81,15 @@ subscriptions model =
 -- VIEW
 
 
+renderRAMUsage : Float -> Html Msg
+renderRAMUsage ramusage =
+    div []
+    [ span [] [text "RAM Usage: "]
+        , span [] [text <| toString ramusage]
+    , span [] []
+    , span [] [text "%"]
+    ]
+
 
 view : Model -> Html Msg
 view model =
@@ -87,9 +97,7 @@ view model =
         [ id "local-system-status-container"
         , class "bg-light"
         ]
-        (List.append
-            [ div [] [text "blah system"]
-            ]
-            [ 
-            ]
-        )
+        [ div [] [text "blah system"]
+        , renderRAMUsage model.ramusagegigs
+        , renderRAMUsage model.ramusagegigs
+        ]
