@@ -15,6 +15,18 @@ import sqlite3
 import glob
 import json
 from shutil import copyfile
+import sys
+
+searchquery = ""
+
+if len(sys.argv) > 1:
+  print("i have an argument")
+  print("is %s" % sys.argv[1])
+  searchquery = sys.argv[1]
+
+print("WTF")
+print("SELECT * from commands where command LIKE %s ORDER BY id desc limit 10" % searchquery)
+
 
 path_to_ash_db = "/home/*/.ash/history.db"
 shadow_db_location = "/tmp/ashshadow.sqlite"
@@ -38,7 +50,12 @@ if False:
 
 
 # Get the Rows
-cursor = conn.execute("SELECT * from commands ORDER BY id desc limit 10")
+if searchquery == "":
+  cursor = conn.execute("SELECT * from commands ORDER BY id desc limit 10")
+else:
+  cursor = conn.execute("SELECT * from commands where command LIKE %s ORDER BY id desc limit 10" % searchquery)
+
+
 outputrows = []
 for row in cursor:
   thisoutputrow = dict()

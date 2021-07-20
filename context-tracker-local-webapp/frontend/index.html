@@ -1,7 +1,8 @@
 <html>
 
 <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 <link type="text/css" rel="stylesheet" media="all" href="frontpage.css">
 
@@ -12,131 +13,132 @@
 
 <style>
   /* These are technically the same, but use both */
-td{
-  overflow-wrap: break-word;
-  word-wrap: break-word;
+  td {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 
-  -ms-word-break: break-all;
-  /* This is the dangerous one in WebKit, as it breaks things wherever */
-  word-break: break-all;
-  /* Instead use this non-standard one: */
-  word-break: break-word;
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
 
-  /* Adds a hyphen where the word breaks, if supported (No Blink) */
-  -ms-hyphens: auto;
-  -moz-hyphens: auto;
-  -webkit-hyphens: auto;
-  hyphens: auto;
-}
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
 
+    max-width: 150px;
+  }
 </style>
 
 
 
 <body>
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h1>Static Jumbotron</h1>
-        <p>TBD frontend this</p>
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="jumbotron">
+    <div class="container">
+      <h1>Static Jumbotron</h1>
+      <p>TBD frontend this</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+      <div class="col">
+        <div id="elm-app-left">
+          hello
+
+          <script>
+            var app = Elm.ShellHistory.init({
+              node: document.getElementById('elm-app-left')
+            });
+          </script>
+
+
+        </div>
+      </div>
+      <div class="col">
+        <div id="elm-app-mid">
+          hello
+
+          <script>
+            var app = Elm.FirefoxHistory.init({
+              node: document.getElementById('elm-app-mid')
+            });
+          </script>
+
+        </div>
+      </div>
+
+    </div>
+
+    <br /><br />
+
+
+    <div class="row">
+      <div class="col-md-4">
+        <div id="elm-app-right">
+          hello
+
+          <script>
+            var app = Elm.ContextViewer.init({
+              node: document.getElementById('elm-app-right')
+            });
+          </script>
+
+        </div>
+      </div>
+
+
+    </div>
+
+
+    <br /><br />
+
+    <div class="row">
+      <div id="navigation">
+        <ul>
+          <li><a href="http://localhost:8080">CraigsMatrix</a></li>
+          <li><a href="http://localhost:631">CUPS</a></li>
+        </ul>
       </div>
     </div>
 
- <div class="container">
-      <!-- Example row of columns -->
-      <div class="row">
-          <div class="col">
-            <div id="elm-app-left">
-              hello
 
-                <script>
-                 var app = Elm.ShellHistory.init({
-                     node: document.getElementById('elm-app-left')
-                 });
-                </script>
+    <div class="row">
 
+      <div class="col-md-4">
+        <div id="elm-app-blah">
+          hello
 
-            </div>
-          </div>
-          <div class="col" >
-            <div id="elm-app-mid">
-              hello
+          <script>
+            var app = Elm.ContextSummary.init({
+              node: document.getElementById('elm-app-blah')
+            });
+          </script>
 
-                <script>
-                 var app = Elm.FirefoxHistory.init({
-                     node: document.getElementById('elm-app-mid')
-                 });
-                </script>
-
-            </div>
-          </div>
-
+        </div>
       </div>
 
-  <br/><br/>
-
-
-  <div class="row">
-          <div class="col-md-4">
-            <div id="elm-app-right">
-              hello
-
-                <script>
-                 var app = Elm.ContextViewer.init({
-                     node: document.getElementById('elm-app-right')
-                 });
-                </script>
-
-            </div>
-          </div>
-
-
+    </div>
   </div>
 
 
-  <br/><br/>
-
-      <div class="row">
-          <div id="navigation">
-            <ul>
-              <li><a href="http://localhost:8080">CraigsMatrix</a></li>
-              <li><a href="http://localhost:631">CUPS</a></li>
-            </ul>
-          </div>
-      </div>
+  <div id="git-global-view">
+    <h3> Git Global View </h3>
+    <ul>
+      <li> journal </li>
+      <li> notes </li>
+    </ul>
+  </div>
 
 
-      <div class="row">
-
-          <div class="col-md-4">
-            <div id="elm-app-blah">
-              hello
-
-                <script>
-                 var app = Elm.ContextSummary.init({
-                     node: document.getElementById('elm-app-blah')
-                 });
-                </script>
-
-            </div>
-          </div>
-
-      </div>
- </div>
-
-
-    <div id="git-global-view">
-      <h3> Git Global View </h3>
-      <ul>
-        <li> journal </li>
-        <li> notes </li>
-      </ul>
-    </div>
-
-
-    <div id="last-filesystem-events">
-      <h3> Last Filesystem Events </h3>
-    </div>
+  <div id="last-filesystem-events">
+    <h3> Last Filesystem Events </h3>
+  </div>
 
 </body>
 

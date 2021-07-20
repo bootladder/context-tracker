@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os/exec"
@@ -11,15 +12,18 @@ import (
 
 var debug = false
 
+type ShellHistoryRequest struct {
+	SearchQuery string
+}
 
 func main() {
 
 	router := httprouter.New()
 
-  // Serve the Frontend
+	// Serve the Frontend
 	router.ServeFiles("/*filepath", http.Dir("../frontend"))
 
-  // Serve the API
+	// Serve the API
 	router.POST("/api/", gitStatusHandler)
 	router.POST("/api/contextlist", contextListHandler)
 	router.POST("/api/shellhistory", shellHistoryHandler)
@@ -28,7 +32,6 @@ func main() {
 	fmt.Println("Serving on 9999")
 	http.ListenAndServe(":9999", router)
 }
-
 
 func firefoxHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	stdout := shellout("/opt/projects/context-tracker/firefox-collector/firefox-collector.py")
@@ -39,7 +42,25 @@ func firefoxHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.
 }
 
 func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	stdout := shellout("/opt/projects/context-tracker/ash-collector/ash_collector.py")
+
+	var shellHistoryRequest ShellHistoryRequest
+	err := json.NewDecoder(r.Body).Decode(&shellHistoryRequest)
+	if err != nil {
+		fmt.Println("wtf error")
+	}
+
+	fmt.Printf("The search query is %s\n", shellHistoryRequest.SearchQuery)
+
+	command := "/opt/projects/context-tracker/ash-collector/ash_collector.py"
+
+	var stdout string
+	if shellHistoryRequest.SearchQuery != "" {
+		stdout = shellout_onearg(command, shellHistoryRequest.SearchQuery)
+	} else {
+		stdout = shellout(command)
+	}
+
+	fmt.Printf("The command is %s\n", command)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -64,17 +85,28 @@ func gitStatusHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 }
 
 func shellout(str string) string {
-	cmd := exec.Command(str, "test")
+	cmd := exec.Command(str)
 	stdout, err := cmd.Output()
 
-    if err != nil {
-        fmt.Println(err.Error())
-        return "fail to shellout"
-    }
+	if err != nil {
+		fmt.Println(err.Error())
+		return "fail to shellout"
+	}
 
 	return string(stdout)
 }
 
+func shellout_onearg(str string, arg string) string {
+	cmd := exec.Command(str, arg)
+	stdout, err := cmd.Output()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return "fail to shellout"
+	}
+
+	return string(stdout)
+}
 
 func fatal(err error, msgs ...string) {
 	if err != nil {
