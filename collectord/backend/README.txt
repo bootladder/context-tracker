@@ -29,6 +29,14 @@ Their only purpose now is to detect new events.  Probably by polling, with SQLit
 or maybe callbacked ala. inotify.
 
 
+postgres has to be installed already.
+probably want to bundle it in with a systemd service
+start collectord, start postgres, or make sure postgres is started.
+now freaking postgres needs a port too, wtf.  how the hell is that any faster
+
+fuck it, fuck postgres, just put the json files in /var/lib/collectord/abc-collector.json
+pass the buck up to central server
+
 
 
 
