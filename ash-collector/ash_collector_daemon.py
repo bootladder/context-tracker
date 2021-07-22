@@ -19,6 +19,17 @@ from shutil import copyfile
 import sys
 import time 
 
+
+import zmq
+
+context = zmq.Context()
+
+#  Socket to talk to server
+print("Connecting to hello world server")
+socket = context.socket(zmq.REQ)
+socket.connect("tcp://localhost:5555")
+
+
 searchquery = ""
 
 
@@ -78,6 +89,11 @@ while True:
   # write the maxid to a file sometimes
 
   # send to msgqueue
-  print(json.dumps(outputrows, indent=2))
+  jsondump = json.dumps(outputrows, indent=2)
+  print(jsondump)
+  socket.send(jsondump)
+  message = socket.recv()
+  print("receivved from socket : ", message)
+
 
 conn.close()
