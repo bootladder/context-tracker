@@ -55,6 +55,10 @@ while True:
   # Get the Rows
   cursor = conn.execute("SELECT * from commands where id > %d ORDER BY id desc limit 10" % latest_row_id)
 
+  collection_object = dict()
+  collection_object['source'] = "ash_collector_daemon.py"
+  collection_object['version'] = "0.0.1"
+
   outputrows = []
   local_max_id = 0
   number_of_rows = 0
@@ -78,18 +82,22 @@ while True:
 
 
   # this is how we check for new rows coming in
-  # wait for new rows with higher ids
   if number_of_rows == 0:
     print("no new rows")
     continue
   
   # we got some outputrows and a new max id
+
+  # prepare object for sending
+  collection_object['rows'] = outputrows
+
+  # update max id
   latest_row_id = local_max_id
   print("new max id is ", latest_row_id)
   # write the maxid to a file sometimes
 
   # send to msgqueue
-  jsondump = json.dumps(outputrows, indent=2)
+  jsondump = json.dumps(collection_object, indent=2)
   print(jsondump)
   socket.send(jsondump)
   message = socket.recv()
