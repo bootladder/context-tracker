@@ -112,9 +112,20 @@ timestampString time =
 
 renderFirefoxHistoryRow : FirefoxHistoryRow -> Html Msg
 renderFirefoxHistoryRow row =
+    let
+        urllength =
+            length row.url
+
+        truncateUrlIfLarge str =
+            if urllength > 40 then
+                (slice 0 40 str) ++ "..."
+
+            else
+                str
+    in
     tr []
         [ td [ id "hello" ] [ text <| timestampString row.last_visit_date ]
-        , td [ id "hello" ] [ text row.url ]
+        , td [ id "hello" ] [ text <| truncateUrlIfLarge row.url ]
         , td [ id "hello" ]
             [ case row.title of
                 Just a ->
