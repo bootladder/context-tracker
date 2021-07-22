@@ -1,4 +1,4 @@
-module bootladder.com/context-tracker-frontpage-backend
+module collectord
 
 go 1.15
 
