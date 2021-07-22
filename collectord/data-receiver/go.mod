@@ -1,4 +1,4 @@
-module collectord-local-webapp
+module collectord-data-receiver
 
 go 1.15
 
