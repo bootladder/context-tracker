@@ -9,6 +9,7 @@ import Http
 import Json.Decode exposing (..)
 import Maybe exposing (withDefault)
 import String exposing (..)
+import Task exposing (perform)
 import Time exposing (..)
 
 
@@ -32,6 +33,7 @@ main =
 type alias Model =
     { debugBreadcrumb : String
     , rows : List FirefoxHistoryRow
+    , localtimezone : Time.Zone
     }
 
 
@@ -49,7 +51,8 @@ init _ =
     ( Model
         "dummy debug"
         []
-    , Cmd.batch [ httpRequestFirefoxHistory ]
+        utc
+    , Cmd.batch [ httpRequestFirefoxHistory, getLocalTimeZone ]
     )
 
 
@@ -60,6 +63,7 @@ init _ =
 type Msg
     = Hello Int
     | ReceivedFirefoxHistory (Result Http.Error (List FirefoxHistoryRow))
+    | GotTimeZone Zone
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -81,6 +85,9 @@ update msg model =
                             Debug.log "error is " e
                     in
                     ( { model | rows = [ FirefoxHistoryRow dummyPosixTime "blahurl" (Just "blahtitle") (Just "blahdesc") ] }, Cmd.none )
+
+        GotTimeZone z ->
+            ( { model | localtimezone = z }, Cmd.none )
 
 
 
@@ -105,14 +112,14 @@ posixToHourMinSec zone posix =
         ++ (String.padLeft 2 '0' <| String.fromInt <| Time.toSecond zone posix)
 
 
-timestampString : Time.Posix -> String
-timestampString time =
+timestampString : Time.Zone -> Time.Posix -> String
+timestampString zone time =
     (Date.format "y-MM-d " <| Date.fromPosix utc time)
-        ++ posixToHourMinSec utc time
+        ++ posixToHourMinSec zone time
 
 
-renderFirefoxHistoryRow : ( FirefoxHistoryRow, Int ) -> Html Msg
-renderFirefoxHistoryRow ( row, index ) =
+renderFirefoxHistoryRow : Time.Zone -> ( FirefoxHistoryRow, Int ) -> Html Msg
+renderFirefoxHistoryRow zone ( row, index ) =
     let
         urllength =
             length row.url
@@ -131,7 +138,7 @@ renderFirefoxHistoryRow ( row, index ) =
           else
             class "blah"
         ]
-        [ td [ id "hello" ] [ text <| timestampString row.last_visit_date ]
+        [ td [ id "hello" ] [ text <| timestampString zone row.last_visit_date ]
         , td [ id "hello" ]
             [ div []
                 [ text <| truncateUrlIfLarge row.url
@@ -143,11 +150,11 @@ renderFirefoxHistoryRow ( row, index ) =
         ]
 
 
-renderFirefoxHistoryTable : List FirefoxHistoryRow -> Html Msg
-renderFirefoxHistoryTable rows =
+renderFirefoxHistoryTable : Time.Zone -> List FirefoxHistoryRow -> Html Msg
+renderFirefoxHistoryTable zone rows =
     table [ class "table" ]
         [ tbody []
-            (List.indexedMap (\i row -> renderFirefoxHistoryRow ( row, i )) rows)
+            (List.indexedMap (\i row -> renderFirefoxHistoryRow zone ( row, i )) rows)
         ]
 
 
@@ -157,7 +164,7 @@ view model =
         (List.append
             [ h2 [] [ text "Firefox History" ]
             ]
-            [ renderFirefoxHistoryTable model.rows
+            [ renderFirefoxHistoryTable model.localtimezone model.rows
             ]
         )
 
@@ -209,3 +216,8 @@ firefoxHistoryRowDecoder =
         (field "url" string)
         (maybe <| field "title" string)
         (maybe <| field "description" string)
+
+
+getLocalTimeZone : Cmd Msg
+getLocalTimeZone =
+    Task.perform GotTimeZone Time.here
