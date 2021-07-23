@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode exposing (..)
+import Maybe exposing (withDefault)
 import String exposing (..)
 import Time exposing (..)
 
@@ -110,29 +111,34 @@ timestampString time =
         ++ posixToHourMinSec utc time
 
 
-renderFirefoxHistoryRow : FirefoxHistoryRow -> Html Msg
-renderFirefoxHistoryRow row =
+renderFirefoxHistoryRow : ( FirefoxHistoryRow, Int ) -> Html Msg
+renderFirefoxHistoryRow ( row, index ) =
     let
         urllength =
             length row.url
 
         truncateUrlIfLarge str =
             if urllength > 40 then
-                (slice 0 40 str) ++ "..."
+                slice 0 40 str ++ "..."
 
             else
                 str
     in
-    tr []
-        [ td [ id "hello" ] [ text <| timestampString row.last_visit_date ]
-        , td [ id "hello" ] [ text <| truncateUrlIfLarge row.url ]
-        , td [ id "hello" ]
-            [ case row.title of
-                Just a ->
-                    text a
+    tr
+        [ if modBy 2 index == 0 then
+            class "alt-row-color"
 
-                Nothing ->
-                    text "nothing"
+          else
+            class "blah"
+        ]
+        [ td [ id "hello" ] [ text <| timestampString row.last_visit_date ]
+        , td [ id "hello" ]
+            [ div []
+                [ text <| truncateUrlIfLarge row.url
+                ]
+            ]
+        , td [ id "hello" ]
+            [ text <| withDefault "nothing" row.title
             ]
         ]
 
@@ -141,7 +147,7 @@ renderFirefoxHistoryTable : List FirefoxHistoryRow -> Html Msg
 renderFirefoxHistoryTable rows =
     table [ class "table" ]
         [ tbody []
-            (List.map renderFirefoxHistoryRow rows)
+            (List.indexedMap (\i row -> renderFirefoxHistoryRow ( row, i )) rows)
         ]
 
 
