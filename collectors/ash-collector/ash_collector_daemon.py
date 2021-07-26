@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # This DAEMON will poll the SQLite database
 # checking for new rows.
@@ -17,18 +17,10 @@ import glob
 import json
 from shutil import copyfile
 import sys
-import time 
+import time
+import collectord_messagequeue
 
-
-import zmq
-
-context = zmq.Context()
-
-#  Socket to talk to server
-print("Connecting to hello world server")
-socket = context.socket(zmq.REQ)
-socket.connect("tcp://localhost:5555")
-
+socket = collectord_messagequeue.start_client()
 
 searchquery = ""
 
@@ -99,9 +91,7 @@ while True:
   # send to msgqueue
   jsondump = json.dumps(collection_object, indent=2)
   print(jsondump)
-  socket.send(jsondump)
-  message = socket.recv()
-  print("receivved from socket : ", message)
 
+  collectord_messagequeue.send_message(socket, jsondump)
 
 conn.close()
