@@ -15,7 +15,7 @@ def main():
   while True:
       #  Wait for next request from client
       message = socket.recv()
-      print("Received msg.")
+      print("\n\nData Collector: Received msg.")
 
       try:
         # check for valid json
