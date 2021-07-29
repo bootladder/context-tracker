@@ -29,18 +29,15 @@ def main():
   while True:
       #  Wait for next request from client
       message = socket.recv()
+      # .decode('utf8')  decode or not?
       print("\n\nData Collector: Received msg.")
 
       try:
         # check for valid json
         collection_object = json.loads(message)
 
-        # look for magic fields
-        source = collection_object['source']
-        print("SOURCE!!! ", source)
-
         # find the appropriate .json file
-        filename = source2filename(source)
+        filename = obj2filename(collection_object)
         print("filename is " + filename)
 
         # append the entire message to the file
@@ -60,7 +57,11 @@ def main():
         socket.send(b"BAD")
 
 
-def source2filename(source):
+def obj2filename(obj):
+  # look for magic fields
+  source  = obj['source']
+  version = obj['version']
+
   # check for bad characters
   return JSON_FILE_STORAGE_DIR + source.replace('_','').replace('.','') + ".json"
 
