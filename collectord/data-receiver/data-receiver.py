@@ -18,6 +18,7 @@ Path(JSON_FILE_STORAGE_DIR).mkdir(parents=True, exist_ok=True)
 
 import time
 import json
+import msgpack
 import zmq
 
 
@@ -33,12 +34,13 @@ def main():
       print("\n\nData Collector: Received msg.")
 
       try:
-        # check for valid json
         collection_object = json.loads(message)
 
-        # find the appropriate .json file
-        filename = obj2filename(collection_object)
+        filename = obj2filename(collection_object, '.msgpack')
         print("filename is " + filename)
+
+        # reformat as msgpack
+        out = msgpack.packb(collection_object)
 
         # append the entire message to the file
         print(message)
@@ -46,7 +48,7 @@ def main():
           f.write(str(message, encoding='utf-8'))
 
         #  Do some 'work'
-        time.sleep(1)
+        #time.sleep(1)
 
         #  Send reply back to client
         socket.send(b"OK")
@@ -57,7 +59,7 @@ def main():
         socket.send(b"BAD")
 
 
-def obj2filename(obj):
+def obj2filename(obj, suffix):
   # look for magic fields
   source  = obj['source']
   version = obj['version']
