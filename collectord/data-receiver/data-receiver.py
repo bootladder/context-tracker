@@ -1,6 +1,16 @@
 #!/usr/bin/python
+#
+# Data Receiver
+# Read from socket, assume it is JSON,
+# Make the data available for 2 consumers:  Local Web App and Central Collector
+#
+# For Local Web App,
+#    store the JSON into a file, based on the "source" field in the JSON
+#    These data files can be further parsed by the local webserver.
+#
+# For Central Collector, HTTP request the payloads up.
 
-# note  /var/lib/collectord has to be acceisible
+# note  /var/lib/collectord has to be accessible, these are where the local files are appended.
 
 import time
 import json

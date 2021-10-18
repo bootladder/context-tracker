@@ -1,10 +1,11 @@
 collectord is 2 things
 
-1. message queue and database for locally installed collector daemons
-to send data to.  The received data can be passed to a central collector
+1. Message queue and database for locally installed collector daemons
+     to send data to.  The received data can be passed to a central collector,
+     and/or handled locally.
 
-1. webapp and frontend for viewing data collected by collectord
-  and possibly also from central collector
+1. Webapp and frontend for viewing data collected by collectord
+     and possibly also from central collector
 
 
 
