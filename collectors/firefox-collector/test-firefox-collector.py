@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
+# Test and PoC for Firefox Collection
+#
 # This shall be a one-shot command to request a JSON of Firefox History
-# the JSON will contain:
-# 
-
-# Parameters may be such as
+# Demonstrates usage of sqlite
 
 import sqlite3
 import json
@@ -12,6 +11,7 @@ import glob
 import sys
 from shutil import copyfile
 
+# First copy the DB to prevent locking.  Connection here will be to the shadow DB
 path_to_firefox_history_db = "/home/*/.mozilla/firefox/*default*/places.sqlite"
 shadow_db_location = "/tmp/firefoxshadow.sqlite"
 
@@ -20,14 +20,8 @@ if len(globresult) != 1:
   print("wtf too many globs")
   sys.exit(1)
 
-#print("database is at " , globresult[0])
 dbfilename = globresult[0]
-
-#print("copy the database because firefox locks it")
-
 copyfile(dbfilename, shadow_db_location)
-
-
 
 conn = sqlite3.connect(shadow_db_location)
 
@@ -41,7 +35,8 @@ if False:
 
 
 # Get the Rows
-cursor = conn.execute("SELECT * from moz_places ORDER BY id desc limit 10")
+num_rows_to_query = 2
+cursor = conn.execute("SELECT * from moz_places ORDER BY id desc limit %s" % num_rows_to_query)
 outputrows = []
 for row in cursor:
   thisoutputrow = dict()
