@@ -11,6 +11,10 @@
 # For Central Collector, HTTP request the payloads up.
 
 # note  /var/lib/collectord has to be accessible, these are where the local files are appended.
+#
+JSON_FILE_STORAGE_DIR = "/var/lib/collectord/"
+from pathlib import Path
+Path(JSON_FILE_STORAGE_DIR).mkdir(parents=True, exist_ok=True)
 
 import time
 import json
@@ -42,7 +46,7 @@ def main():
         # append the entire message to the file
         print(message)
         with open(filename, 'a+') as f:
-          f.write(message)
+          f.write(str(message))
 
         #  Do some 'work'
         time.sleep(1)
@@ -58,7 +62,7 @@ def main():
 
 def source2filename(source):
   # check for bad characters
-  return "/var/lib/collectord/" + source.replace('_','').replace('.','') + ".json"
+  return JSON_FILE_STORAGE_DIR + source.replace('_','').replace('.','') + ".json"
 
 
 if __name__ == "__main__":
