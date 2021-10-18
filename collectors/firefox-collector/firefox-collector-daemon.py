@@ -15,14 +15,19 @@ def get_exact_path_to_firefox_sqlite():
     print("wtf too many globs")
     sys.exit(1)
 
-  #print("database is at " , globresult[0])
+  print("database is at " , globresult[0])
   dbfilename = globresult[0]
+  return dbfilename
 
 
 
 # Setup collectord messagequeue to send JSON to
 import collectord_messagequeue
-socket = collectord_messagequeue.start_client()
+try:
+  socket = collectord_messagequeue.start_client()
+  print("Socket good to go")
+except e:
+  print("fail catch")
 
 dbfilename = get_exact_path_to_firefox_sqlite()
 
@@ -101,7 +106,8 @@ while True:
   print(jsondump)
 
   # Send JSON to Message Queue
+  print("SENDING TO MESSAGE QUEUE")
   collectord_messagequeue.send_message(socket, jsondump)
 
-  # Close connection to shadow db every loop
+  # close every lop
   conn.close()
