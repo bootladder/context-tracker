@@ -102,8 +102,8 @@ while True:
   # Write the maxid to a file sometimes (TODO)
 
   # Serialize collection object to JSON
-  jsondump = json.dumps(collection_object, indent=2)
-  print(jsondump)
+  jsondump = json.dumps(collection_object, ensure_ascii=False)
+  print(jsondump[1:])
 
   # Send JSON to Message Queue
   print("SENDING TO MESSAGE QUEUE")

@@ -46,7 +46,7 @@ def main():
         # append the entire message to the file
         print(message)
         with open(filename, 'a+') as f:
-          f.write(str(message))
+          f.write(str(message, encoding='utf-8'))
 
         #  Do some 'work'
         time.sleep(1)
