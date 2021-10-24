@@ -40,7 +40,7 @@ func jsonHttpResponse(w http.ResponseWriter, body string) {
 }
 
 func firefoxHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	stdout := shellout("/opt/projects/context-tracker/firefox-collector/firefox-collector.py")
+	stdout := shellout("/usr/bin/context-tracker/firefox-collector-request.py")
 	jsonHttpResponse(w, stdout)
 }
 
