@@ -114,7 +114,7 @@ posixToHourMinSec zone posix =
 
 timestampString : Time.Zone -> Time.Posix -> String
 timestampString zone time =
-    (Date.format "y-MM-d " <| Date.fromPosix utc time)
+    (Date.format "y-MM-dd " <| Date.fromPosix utc time)
         ++ posixToHourMinSec zone time
 
 
