@@ -52,7 +52,7 @@ latest_row_id = 0
 
 while True:
   print("sleep")
-  time.sleep(5.0)
+  time.sleep(2.0)
 
   #copy the database because firefox locks it
   shadow_db_location = "/tmp/firefoxshadow.sqlite"

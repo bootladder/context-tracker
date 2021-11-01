@@ -41,6 +41,7 @@ func jsonHttpResponse(w http.ResponseWriter, body string) {
 
 func firefoxHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	stdout := shellout("/usr/bin/context-tracker/firefox-collector-request.py")
+	fmt.Println("firefox stdout got")
 	jsonHttpResponse(w, stdout)
 }
 
@@ -49,7 +50,7 @@ func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 	var shellHistoryRequest ShellHistoryRequest
 	err := json.NewDecoder(r.Body).Decode(&shellHistoryRequest)
 	if err != nil {
-		fmt.Println("wtf error")
+		fmt.Println("Error decoding shell history request")
 	}
 
 	fmt.Printf("The search query is %s\n", shellHistoryRequest.SearchQuery)
@@ -85,7 +86,7 @@ func shellout(str string) string {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		return "fail to shellout"
+		return "fail to shellout" + str
 	}
 
 	return string(stdout)
