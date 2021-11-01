@@ -86,7 +86,6 @@ pushd $install_DIR
 
 popd
 
-exit 0
 
 pushd frontend
   pushd shell-history
