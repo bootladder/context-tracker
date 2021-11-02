@@ -114,7 +114,7 @@ posixToHourMinSec zone posix =
 
 timestampString : Time.Zone -> Time.Posix -> String
 timestampString zone time =
-    (Date.format "y-MM-d " <| Date.fromPosix utc time)
+    (Date.format "y-MM-dd " <| Date.fromPosix utc time)
         ++ posixToHourMinSec zone time
 
 
@@ -150,11 +150,34 @@ renderFirefoxHistoryRow zone ( row, index ) =
         ]
 
 
+sortByTimestamp a b =
+    let
+        atimeint =
+            posixToMillis <| a.last_visit_date
+
+        btimeint =
+            posixToMillis <| b.last_visit_date
+    in
+    case Basics.compare atimeint btimeint of
+        LT ->
+            GT
+
+        GT ->
+            LT
+
+        EQ ->
+            EQ
+
+
 renderFirefoxHistoryTable : Time.Zone -> List FirefoxHistoryRow -> Html Msg
 renderFirefoxHistoryTable zone rows =
+    let
+        sortedRows =
+            rows |> List.sortWith sortByTimestamp
+    in
     table [ class "table" ]
         [ tbody []
-            (List.indexedMap (\i row -> renderFirefoxHistoryRow zone ( row, i )) rows)
+            (List.indexedMap (\i row -> renderFirefoxHistoryRow zone ( row, i )) sortedRows)
         ]
 
 

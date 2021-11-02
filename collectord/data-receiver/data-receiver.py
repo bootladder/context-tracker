@@ -6,6 +6,7 @@
 #
 # For Local Web App,
 #    store the JSON into a file, based on the "source" field in the JSON
+#    Convert incoming JSON to jsonlines to allow line separation
 #    These data files can be further parsed by the local webserver.
 #
 # For Central Collector, HTTP request the payloads up.
@@ -18,14 +19,13 @@ Path(JSON_FILE_STORAGE_DIR).mkdir(parents=True, exist_ok=True)
 
 import time
 import json
-import msgpack
+import jsonlines
 import zmq
 
+socket = 0  #zmq socket
 
 def main():
-  context = zmq.Context()
-  socket = context.socket(zmq.REP)
-  socket.bind("tcp://*:5555")
+  setup_zmq_socket()
 
   while True:
       #  Wait for next request from client
@@ -34,13 +34,11 @@ def main():
       print("\n\nData Collector: Received msg.")
 
       try:
+        c1 = jsonlines.Reader(message)
         collection_object = json.loads(message)
 
         filename = obj2filename(collection_object, '.msgpack')
         print("filename is " + filename)
-
-        # reformat as msgpack
-        out = msgpack.packb(collection_object)
 
         # append the entire message to the file
         print(message)
@@ -66,6 +64,12 @@ def obj2filename(obj, suffix):
 
   # check for bad characters
   return JSON_FILE_STORAGE_DIR + source.replace('_','').replace('.','') + ".json"
+
+def setup_zmq_socket():
+  global socket
+  context = zmq.Context()
+  socket = context.socket(zmq.REP)
+  socket.bind("tcp://*:5555")
 
 
 if __name__ == "__main__":
