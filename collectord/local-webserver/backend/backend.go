@@ -55,7 +55,7 @@ func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 
 	fmt.Printf("The search query is %s\n", shellHistoryRequest.SearchQuery)
 
-	command := "/opt/projects/context-tracker/ash-collector/ash_collector_oneshot.py"
+	command := "/usr/bin/context-tracker/ash-collector-request.py"
 
 	var stdout string
 	if shellHistoryRequest.SearchQuery != "" {
