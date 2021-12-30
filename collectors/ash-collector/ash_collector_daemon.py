@@ -59,6 +59,7 @@ def process_new_ash_row_and_send_to_data_receiver(row):
   jsondump = json.dumps(collection_object, indent=2)
   print(jsondump)
 
+## TODO TIMEOUT!!! IT HANGS
   collectord_messagequeue.send_message(socket, jsondump)
 
 
