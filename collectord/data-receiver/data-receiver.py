@@ -20,37 +20,57 @@ import zmq
 
 socket = 0  #zmq socket
 
+common_vector_version = '0.0.1'
+
+def c2c_ash_collector_0_0_1(collection_object):
+  commonvector = dict()
+  commonvector['version'] = common_vector_version
+  commonvector['command'] = collection_object['command']
+  commonvector['pwd'] = collection_object['cwd']
+  return commonvector
+
+
+
+# Table of conversions
+conversion_funcs = dict()
+conversion_funcs['ash_collector_daemon.py'] = dict()
+conversion_funcs['ash_collector_daemon.py']['0.0.1'] = c2c_ash_collector_0_0_1
+
+
+def convert_to_common_vector(collection_object):
+  # validate object
+  data_source = collection_object['source']
+  data_version = collection_object['version']
+
+  conversion_func = conversion_funcs[data_source][data_version]
+  vector = conversion_func(collection_object)
+  return vector
+
+
+def insert_common_vector_into_local_storage(vector):
+
+  return True
+
 def main():
   setup_zmq_socket()
 
   while True:
-      #  Wait for next request from client
+      #  Wait for any collectors to send data
       message = socket.recv()
-      # .decode('utf8')  decode or not?
       print("\n\nData Collector: Received msg.")
 
       try:
         collection_object = json.loads(message)
+        commonvector = convert_to_common_vector(collection_object)
 
-        # validate object
-
-        # insert into database
-
-        # append the entire message to the file
-        print(message)
-        with open(filename, 'a+') as f:
-          f.write(str(message, encoding='utf-8'))
-
-        #  Do some 'work'
-        #time.sleep(1)
+        insert_common_vector_into_local_storage(commonvector)
 
         #  Send reply back to client
         socket.send(b"OK")
 
       except Exception as e:
         print(e)
-        print("Pbad")
-        socket.send(b"BAD")
+        socket.send(b"Error at data receiver")
 
 
 def setup_zmq_socket():
