@@ -28,16 +28,39 @@ searchquery = ""
 path_to_ash_db = "/home/*/.ash/history.db"
 shadow_db_location = "/tmp/ashshadow.sqlite"
 
+# Get the path to the user's ASH database
 globresult = glob.glob(path_to_ash_db)
 if len(globresult) != 1:
   print("wtf too many globs")
   sys.exit(1)
-
-
 dbfilename = globresult[0]
+
+# Connect to the ASH database
 conn = sqlite3.connect(dbfilename)
 
+# Track the last id, so only the latest
+# new rows are sent up to data receiver
 latest_row_id = 0
+
+
+
+
+
+def process_new_ash_row_and_send_to_data_receiver(row):
+  collection_object = dict()
+  collection_object['source'] = "ash_collector_daemon.py"
+  collection_object['version'] = "0.0.1"
+
+  collection_object['cwd']         = row[6]
+  collection_object['starttime']    = row[8]
+  collection_object['command']     = row[13]
+
+  # send to msgqueue
+  jsondump = json.dumps(collection_object, indent=2)
+  print(jsondump)
+
+  collectord_messagequeue.send_message(socket, jsondump)
+
 
 while True:
 
@@ -47,9 +70,6 @@ while True:
   # Get the Rows
   cursor = conn.execute("SELECT * from commands where id > %d ORDER BY id desc limit 10" % latest_row_id)
 
-  collection_object = dict()
-  collection_object['source'] = "ash_collector_daemon.py"
-  collection_object['version'] = "0.0.1"
 
   outputrows = []
   local_max_id = 0
@@ -58,12 +78,7 @@ while True:
     # track number of rows in the query
     number_of_rows = number_of_rows + 1
 
-    # save the row in a dict
-    thisoutputrow = dict()
-    thisoutputrow['cwd']         = row[6]
-    thisoutputrow['starttime']    = row[8]
-    thisoutputrow['command']     = row[13]
-    outputrows.append(thisoutputrow)
+    process_new_ash_row_and_send_to_data_receiver(row)
 
     # track highest id
     thisrowid = row[0]
@@ -80,18 +95,12 @@ while True:
   
   # we got some outputrows and a new max id
 
-  # prepare object for sending
-  collection_object['rows'] = outputrows
 
   # update max id
   latest_row_id = local_max_id
   print("new max id is ", latest_row_id)
   # write the maxid to a file sometimes
 
-  # send to msgqueue
-  jsondump = json.dumps(collection_object, indent=2)
-  print(jsondump)
 
-  collectord_messagequeue.send_message(socket, jsondump)
 
 conn.close()
