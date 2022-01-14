@@ -58,12 +58,31 @@ def c2c_ash_collector_0_0_1(collection_object):
   commonvector['timestamp'] = int(time.time())
   return commonvector
 
+def c2c_firefox_collector_0_0_1(collection_object):
+    print("c2c firefox 0 0 1")
+    commonvector = dict()
+    try:
+        commonvector['version'] = common_vector_version
+        commonvector['source'] = collection_object['source']
+        commonvector['sourceversion'] = collection_object['version']
+        commonvector['url'] = collection_object['url']
 
+        # timestamp is not in this version
+        commonvector['timestamp'] = int(time.time())
+
+    except Exception as e:
+        print(e)
+        print("unable to parse incoming vector")
+
+    print("c2c OK")
+    return commonvector
 
 # Table of conversions
 conversion_funcs = dict()
 conversion_funcs['ash_collector_daemon.py'] = dict()
 conversion_funcs['ash_collector_daemon.py']['0.0.1'] = c2c_ash_collector_0_0_1
+conversion_funcs['firefox_collector_daemon.py'] = dict()
+conversion_funcs['firefox_collector_daemon.py']['0.0.1'] = c2c_firefox_collector_0_0_1
 
 
 def convert_to_common_vector(collection_object):
@@ -74,21 +93,38 @@ def convert_to_common_vector(collection_object):
   print("herp", data_source, data_version)
 
   # make sure there is a handler defined TODO
-  conversion_func = conversion_funcs[data_source][data_version]
-  vector = conversion_func(collection_object)
+  vector = dict()
+  try:
+      conversion_func = conversion_funcs[data_source][data_version]
+      vector = conversion_func(collection_object)
+  except Exception as e:
+      print("no conversion function defined for incoming data")
+      print("this is the collection_object")
+      print(collection_object)
+
   return vector
 
 
 def insert_common_vector_into_local_storage(vector):
-
-    rowlist = [vector['version'], vector['pwd'], vector['command']]
-    cursor = conn.execute("INSERT INTO commonvector values (?,?,?)", rowlist)
-    conn.commit()
+    print("insert_common_vector_into_local_storage")
+    try:
+        print("clearly sqlite local storage is flawed because")
+        print("excessive maintenance of common vector schema")
+        # rowlist = [vector['version'], vector['pwd'], vector['command']]
+        # cursor = conn.execute("INSERT INTO commonvector values (?,?,?)", rowlist)
+        # conn.commit()
+    except Exception as e:
+        print(e)
+        print("fail local storage")
 
 def insert_common_vector_into_central_storage(vector):
-    print("inserting common vector")
-    collection.insert_one(vector)
-    print("done")
+    print("insert_common_vector_into_central_storage")
+    try:
+        collection.insert_one(vector)
+        print("done")
+    except Exception as e:
+        print(e)
+        print("fail central storage)")
 
 
 
@@ -104,6 +140,8 @@ def main():
         collection_object = json.loads(message)
         commonvector = convert_to_common_vector(collection_object)
 
+        print("Common Vector ready for storage: ")
+        print(commonvector)
         insert_common_vector_into_local_storage(commonvector)
         insert_common_vector_into_central_storage(commonvector)
 
