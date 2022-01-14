@@ -12,6 +12,8 @@
 #
 # For Central Collector, HTTP request the payloads up.
 
+# 2022-01-13 adding central mongo store
+
 #
 import time
 import json
@@ -26,6 +28,7 @@ socket = 0  #zmq socket
 
 common_vector_version = '0.0.1'
 
+# connect to local db
 path_to_commonvector_db = "/home/*/.context-tracker/commonvector.db"
 globresult = glob.glob(path_to_commonvector_db)
 if len(globresult) != 1:
@@ -33,14 +36,26 @@ if len(globresult) != 1:
   sys.exit(1)
 dbfilename = globresult[0]
 conn = sqlite3.connect(dbfilename)
+print("connected to local db")
 
+# connect to central db
+from pymongo import MongoClient
+centraldbclient = MongoClient("bootladder.com:9017")
+db = centraldbclient['steve_context_tracker']
+collection = db["common_vectors"]
+print("connected to central db")
 
 def c2c_ash_collector_0_0_1(collection_object):
   print("watffff")
   commonvector = dict()
   commonvector['version'] = common_vector_version
+  commonvector['source'] = collection_object['source']
+  commonvector['sourceversion'] = collection_object['version']
   commonvector['command'] = collection_object['command']
   commonvector['pwd'] = collection_object['cwd']
+
+  # timestamp is not in this version
+  commonvector['timestamp'] = int(time.time())
   return commonvector
 
 
@@ -58,6 +73,7 @@ def convert_to_common_vector(collection_object):
   data_version = collection_object['version']
   print("herp", data_source, data_version)
 
+  # make sure there is a handler defined TODO
   conversion_func = conversion_funcs[data_source][data_version]
   vector = conversion_func(collection_object)
   return vector
@@ -68,6 +84,12 @@ def insert_common_vector_into_local_storage(vector):
     rowlist = [vector['version'], vector['pwd'], vector['command']]
     cursor = conn.execute("INSERT INTO commonvector values (?,?,?)", rowlist)
     conn.commit()
+
+def insert_common_vector_into_central_storage(vector):
+    print("inserting common vector")
+    collection.insert_one(vector)
+    print("done")
+
 
 
 def main():
@@ -83,6 +105,7 @@ def main():
         commonvector = convert_to_common_vector(collection_object)
 
         insert_common_vector_into_local_storage(commonvector)
+        insert_common_vector_into_central_storage(commonvector)
 
         #  Send reply back to client
         socket.send(b"OK")
