@@ -47,3 +47,10 @@ for item in item_details:
 betterresults = collection.find({"_id":"U1IT00003"})
 for results in betterresults:
   print(results)
+
+
+print("\n\n\n\blalbhalah\n\n\n\n")
+
+betterresults = collection.find({"source":"firefox_collector_daemon.py"})
+for results in betterresults:
+    print(results)

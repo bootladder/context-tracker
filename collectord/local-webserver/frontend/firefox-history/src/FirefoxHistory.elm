@@ -138,7 +138,7 @@ renderFirefoxHistoryRow zone ( row, index ) =
           else
             class "blah"
         ]
-        [ td [ id "hello" ] [ text <| timestampString zone row.last_visit_date ]
+        [ td [ id "hello" ] [ text <| timestampString zone row.timestamp ]
         , td [ id "hello" ]
             [ div []
                 [ text <| truncateUrlIfLarge row.url
@@ -153,10 +153,10 @@ renderFirefoxHistoryRow zone ( row, index ) =
 sortByTimestamp a b =
     let
         atimeint =
-            posixToMillis <| a.last_visit_date
+            posixToMillis <| a.timestamp
 
         btimeint =
-            posixToMillis <| b.last_visit_date
+            posixToMillis <| b.timestamp
     in
     case Basics.compare atimeint btimeint of
         LT ->
@@ -207,7 +207,7 @@ httpRequestFirefoxHistory =
 
 
 type alias FirefoxHistoryRow =
-    { last_visit_date : Time.Posix
+    { timestamp : Time.Posix
     , url : String
     , title : Maybe String
     , description : Maybe String
@@ -235,7 +235,7 @@ firefoxHistoryDecoder =
 firefoxHistoryRowDecoder : Decoder FirefoxHistoryRow
 firefoxHistoryRowDecoder =
     map4 FirefoxHistoryRow
-        (field "last_visit_date" decodePosixTime)
+        (field "timestamp" decodePosixTime)
         (field "url" string)
         (maybe <| field "title" string)
         (maybe <| field "description" string)

@@ -67,8 +67,9 @@ def c2c_firefox_collector_0_0_1(collection_object):
         commonvector['sourceversion'] = collection_object['version']
         commonvector['url'] = collection_object['url']
 
-        # timestamp is not in this version
-        commonvector['timestamp'] = int(time.time())
+        # timestamp is last_visit_date
+        # commonvector['timestamp'] = int(time.time())
+        commonvector['timestamp'] = collection_object['last_visit_date']
 
     except Exception as e:
         print(e)
