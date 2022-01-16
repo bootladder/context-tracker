@@ -65,7 +65,7 @@ init _ =
         False
         False
       --zone
-    , Cmd.batch [ httpRequestShellHistory, getLocalTimeZone ]
+    , Cmd.batch [ httpRequestShellHistoryWithSearch "", getLocalTimeZone ]
     )
 
 
@@ -278,21 +278,6 @@ view model =
 
 
 -- HTTP
-
-
-httpRequestShellHistory : Cmd Msg
-httpRequestShellHistory =
-    let
-        jsonBody =
-            "{ \"searchquery\" : \"" ++ "\"}"
-    in
-    Http.post
-        { body =
-            Http.stringBody "application/json" jsonBody
-        , url = "http://localhost:9999/api/shellhistory"
-        , expect = Http.expectJson ReceivedShellHistory shellHistoryDecoder
-        }
-
 
 httpRequestShellHistoryWithSearch : String -> Cmd Msg
 httpRequestShellHistoryWithSearch querystr =
