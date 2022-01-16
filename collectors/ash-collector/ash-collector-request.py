@@ -1,73 +1,51 @@
 #!/usr/bin/python
 
-# this shall be a one-shot command to request a JSON of shell history
-# the JSON will contain an array of history entries
+# frontend wants a list of rows
+# By default it will be the last 10 entries
 
-# Parameters may be such as
-# - number of entries
-# - search string
-# - date range
-# - from cwd
-
-# By default it will be the last 100 (10 for now, testing) shell commands
-
-# TODO PRINT LOGS TO STDERR OR ELSEWHERE
-
-import sqlite3
-import glob
-import json
-from shutil import copyfile
 import sys
+from pymongo import MongoClient
+from bson import json_util
 
+# CHECK ARGS
 searchquery = ""
-
 if len(sys.argv) > 1:
-  # print("i have an argument")
-  # print("is %s" % sys.argv[1])
   searchquery = sys.argv[1]
-
-
-path_to_ash_db = "/home/*/.ash/history.db"
-shadow_db_location = "/tmp/ashshadow.sqlite"
-
-globresult = glob.glob(path_to_ash_db)
-if len(globresult) != 1:
-  print("wtf too many globs")
+else:
+  print("not enough args supplied. quit")
   sys.exit(1)
 
+# CONNECT TO MONGODB
+try:
+  client = MongoClient("bootladder.com:9017")
+  db = client['steve_context_tracker']
+  collection = db["common_vectors"]
+except Exception as e:
+  print("fail to connect to mongodb")
+  print(e)
 
-dbfilename = globresult[0]
-conn = sqlite3.connect(dbfilename)
+# QUERY THE DB
+try:
+  resultslist = []
+  betterresults = collection.find({"source":"ash_collector_daemon.py"}).limit(10)
+  for result in betterresults:
 
-# want to look at schema? for testing only
-if False:
-  cursor = conn.execute("SELECT sql from sqlite_master where name='commands'")
-  for row in cursor:
-    for poop in row:
-      print(poop)
-    print('wat')
-
-
-# Get the Rows
-if searchquery == "":
-  cursor = conn.execute("SELECT * from commands ORDER BY id desc limit 10")
-else:
-  sqlcommand = "SELECT * from commands where command LIKE \"%%%s%%\" ORDER BY id desc limit 10" % searchquery
-  # print(sqlcommand)
-  cursor = conn.execute(sqlcommand)
-
-
-outputrows = []
-for row in cursor:
-  thisoutputrow = dict()
-  thisoutputrow['cwd']         = row[6]
-  thisoutputrow['starttime']    = row[8]
-  thisoutputrow['command']     = row[13]
-  outputrows.append(thisoutputrow)
-
-conn.close()
+    #  KLUDGE VALIDATE THIS DATA CLEAN THE DAMN DATA
+    if 'timestamp' not in result:
+      result['timestamp'] = 0
+    resultslist.append(result)
+    # print(result)
+except Exception as e:
+  print("fail to query db")
+  print(e)
 
 
-print(json.dumps(outputrows, indent=2))
-#for outputrow in outputrows:
-#  print(outputrow)
+
+try:
+  responsestring = json_util.dumps(resultslist, indent=2)
+  print(responsestring)
+except Exception as e:
+  print(e)
+  print("fail dumps")
+
+
