@@ -37,6 +37,8 @@ type alias Model =
     , searchquerystring : String
     , searchsizeint : Int
     , localtimezone : Zone
+    , searchquerytypeandchecked : Bool
+    , searchquerytypeorchecked : Bool
     }
 
 
@@ -60,6 +62,8 @@ init _ =
         10
         -- search size
         utc
+        False
+        False
       --zone
     , Cmd.batch [ httpRequestShellHistory, getLocalTimeZone ]
     )
@@ -75,6 +79,8 @@ type Msg
     | SearchButtonClicked
     | SearchInputHappened String
     | SearchSizeInputHappened String
+    | SearchQueryTypeANDCheckedHappened Bool
+    | SearchQueryTypeORCheckedHappened Bool
     | GotTimeZone Zone
 
 
@@ -112,6 +118,14 @@ update msg model =
               }
             , Cmd.none
             )
+
+        SearchQueryTypeANDCheckedHappened b ->
+            ( {model | searchquerytypeorchecked = b}
+            ,Cmd.none)
+
+        SearchQueryTypeORCheckedHappened b ->
+            ( {model | searchquerytypeorchecked = b}
+            ,Cmd.none)
 
         GotTimeZone z ->
             ( { model | localtimezone = z }, Cmd.none )
@@ -181,21 +195,70 @@ renderShellHistoryTable rows zone =
 renderPwdSearch: Model -> Html Msg
 renderPwdSearch model =
     div []
-                [ input [ onInput SearchInputHappened ] []
+                [
+                 span [] [text "pwd"]
+                , input [ onInput SearchInputHappened ] []
                 , button [ onClick SearchButtonClicked ] [ text "search" ]
-                , span [] [ text "spacer" ]
-                , button [] [ text "<" ]
-                , span [] [ text "10/20" ]
-                , button [] [ text ">" ]
-                , span [] [ text "spacer" ]
-                , input [ onInput SearchSizeInputHappened, Html.Attributes.value <| toString model.searchsizeint ] []
+
                 ]
+
+renderCommandSearch: Model -> Html Msg
+renderCommandSearch model =
+    div []
+                [
+                  span [] [text "command"]
+                , input [ onInput SearchInputHappened ] []
+                , button [ onClick SearchButtonClicked ] [ text "search" ]
+                ]
+
+renderQueryTypeSelector : Model -> Html Msg
+renderQueryTypeSelector model =
+    div []
+    [
+        div []
+        [
+            span [] [text "AND"]
+            ,input [ type_ "checkbox", onCheck SearchQueryTypeANDCheckedHappened] []
+
+         ]
+         , div []
+         [
+         span [] [text "OR"]
+         ,input [ type_ "checkbox", onCheck SearchQueryTypeORCheckedHappened] []
+         ]
+
+    ]
+
+
+renderPaginator: Model -> Html Msg
+renderPaginator model =
+    div [class "form-group row"]
+        [
+            div [class "col-xs-2"] [
+            input [
+            onInput SearchSizeInputHappened,
+            Html.Attributes.value <| toString model.searchsizeint
+            ] []
+            ]
+         ,
+         div [class "col-xs-4"] [
+
+                     button [] [ text "<" ]
+                     , span [] [ text "10/20" ]
+                     , button [] [ text ">" ]
+                     , span [] [ text "spacer" ]
+                     ]
+         ]
+
 
 renderHeader : Model -> Html Msg
 renderHeader model =
     div []
         [ h2 [] [ text "Shell History" ]
         , renderPwdSearch model
+        , renderCommandSearch model
+        , renderQueryTypeSelector model
+        , renderPaginator model
         ]
 
 
