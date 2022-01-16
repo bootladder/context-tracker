@@ -10,6 +10,8 @@ import (
 	"github.com/pkg/errors"
 
 	"io/ioutil"
+	"strings"
+	"bytes"
 )
 
 var debug = false
@@ -63,7 +65,7 @@ func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 	command := "/usr/bin/context-tracker/ash-collector-request.py"
 	var stdout string
 
-		stdout = shellout_onearg(command, string(body))
+		stdout = shellout_with_string_to_stdin(command, string(body))
 
 
 // 	var stdout string
@@ -107,12 +109,27 @@ func shellout_onearg(str string, arg string) string {
 	stdout, err := cmd.Output()
 
 	if err != nil {
+		fmt.Println("ONEARG ERRORRRR\n\n")
 		fmt.Println(err.Error())
 		fmt.Println(string(stdout))
 		return "fail to shellout: " + err.Error()
 	}
 
 	return string(stdout)
+}
+
+func shellout_with_string_to_stdin(command string, stdindata string) string {
+    p := exec.Command(command)
+    p.Stdin = strings.NewReader(stdindata)
+    var out bytes.Buffer
+    p.Stdout = &out
+    err := p.Run()
+    if err != nil {
+        fmt.Println("SHELLOUT STDIN FAIL")
+    }
+//     stdout, _ := p.Output()
+    fmt.Println("wtf")
+    return out.String()
 }
 
 func fatal(err error, msgs ...string) {

@@ -8,11 +8,20 @@
 import sys
 from pymongo import MongoClient
 from bson import json_util
+import json
 
 # CHECK ARGS (first arg is search query TODO NO)
-searchquery = ""
-if len(sys.argv) > 1:
-  searchquery = sys.argv[1]
+# print(sys.argv[1])
+# sys.exit(0)
+# searchquery = ""
+# if len(sys.argv) > 1:
+#   searchquery = sys.argv[1]
+
+
+data = sys.stdin.readlines()[0]
+print(data)
+requestobject = json.loads(data)
+# print(requestobject)
 
 # CONNECT TO MONGODB
 try:
@@ -36,8 +45,8 @@ try:
       ,
       "$or":
       [
-        {"command":{"$regex":".*%s.*"%(searchquery)}}
-        ,{"pwd": {"$regex":".*%s.*"%(searchquery)}}
+        {"command":{"$regex":".*%s.*"%(requestobject['commandsearchquery'])}}
+        ,{"pwd": {"$regex":".*%s.*"%(requestobject['pwdsearchquery'])}}
       ]
 
     })\

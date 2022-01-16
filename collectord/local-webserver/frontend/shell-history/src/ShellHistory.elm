@@ -129,7 +129,7 @@ update msg model =
             )
 
         SearchQueryTypeANDCheckedHappened b ->
-            ( {model | searchquerytypeorchecked = b}
+            ( {model | searchquerytypeandchecked = b}
             ,Cmd.none)
 
         SearchQueryTypeORCheckedHappened b ->
@@ -296,6 +296,9 @@ httpRequestShellHistoryWithSearch model =
             [
             ("pwdsearchquery", Json.Encode.string model.pwdsearchquerystring)
             ,("commandsearchquery", Json.Encode.string model.commandsearchquerystring)
+            ,("searchquerytypeandchecked", Json.Encode.bool model.searchquerytypeandchecked)
+            ,("searchquerytypeorchecked", Json.Encode.bool model.searchquerytypeorchecked)
+            ,("searchsize", Json.Encode.int model.searchsizeint)
             ]
 
     in
