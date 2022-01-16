@@ -166,7 +166,7 @@ renderShellHistoryRow : ShellHistoryRow -> Time.Zone -> Html Msg
 renderShellHistoryRow row zone =
     tr []
         [ td [ id "hello" ] [ text <| timestampString row.timestamp zone ]
-        , td [ id "hello" ] [ text row.cwd ]
+        , td [ id "hello" ] [ text row.pwd ]
         , td [ id "hello" ] [ text row.command ]
         ]
 
@@ -243,7 +243,7 @@ httpRequestShellHistoryWithSearch querystr =
 type alias ShellHistoryRow =
     { timestamp : Time.Posix
     , command : String
-    , cwd : String
+    , pwd : String
     }
 
 
@@ -266,7 +266,7 @@ shellHistoryRowDecoder =
     map3 ShellHistoryRow
         (field "timestamp" decodePosixTime)
         (field "command" string)
-        (field "cwd" string)
+        (field "pwd" string)
 
 
 getLocalTimeZone : Cmd Msg

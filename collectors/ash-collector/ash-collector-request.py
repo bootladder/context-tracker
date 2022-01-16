@@ -3,6 +3,8 @@
 # frontend wants a list of rows
 # By default it will be the last 10 entries
 
+# ONLY PRINT THE RESPONSE JSON !!!!
+
 import sys
 from pymongo import MongoClient
 from bson import json_util
@@ -27,7 +29,22 @@ except Exception as e:
 # QUERY THE DB
 try:
   resultslist = []
-  betterresults = collection.find({"source":"ash_collector_daemon.py"}).limit(10)
+  betterresults = collection.find(
+    {
+      "$and":
+        [
+          {"source":"ash_collector_daemon.py"}
+
+        ]
+      ,
+      "$or":
+      [
+        {"command":{"$regex":".*%s.*"%(searchquery)}}
+        ,{"pwd": {"$regex":".*%s.*"%(searchquery)}}
+      ]
+
+    })\
+    .limit(10)
   for result in betterresults:
 
     #  KLUDGE VALIDATE THIS DATA CLEAN THE DAMN DATA
