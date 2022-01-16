@@ -6,7 +6,7 @@ import Debug exposing (toString)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Http
+import Http exposing (..)
 import Json.Decode exposing (..)
 import String exposing (..)
 import Task exposing (perform)
@@ -92,7 +92,7 @@ update msg model =
                     ( { model | rows = status }, Cmd.none )
 
                 Err e ->
-                    ( { model | rows = [ ShellHistoryRow dummyPosixTime "blah" "blah" ] }, Cmd.none )
+                    ( { model | rows = [ ShellHistoryRow dummyPosixTime "failtoparse" (errorToString e) ] }, Cmd.none )
 
         SearchButtonClicked ->
             ( model, Cmd.batch [ httpRequestShellHistoryWithSearch model.searchquerystring ] )
@@ -116,7 +116,24 @@ update msg model =
         GotTimeZone z ->
             ( { model | localtimezone = z }, Cmd.none )
 
-
+-- http
+errorToString : Http.Error -> String
+errorToString error =
+    case error of
+        BadUrl url ->
+            "The URL " ++ url ++ " was invalid"
+        Timeout ->
+            "Unable to reach the server, try again"
+        NetworkError ->
+            "Unable to reach the server, check your network connection"
+        BadStatus 500 ->
+            "The server had a problem, try again later"
+        BadStatus 400 ->
+            "Verify your information and try again"
+        BadStatus _ ->
+            "Unknown error"
+        BadBody errorMessage ->
+            errorMessage
 
 -- SUBSCRIPTIONS
 
@@ -148,7 +165,7 @@ timestampString time zone =
 renderShellHistoryRow : ShellHistoryRow -> Time.Zone -> Html Msg
 renderShellHistoryRow row zone =
     tr []
-        [ td [ id "hello" ] [ text <| timestampString row.starttime zone ]
+        [ td [ id "hello" ] [ text <| timestampString row.timestamp zone ]
         , td [ id "hello" ] [ text row.cwd ]
         , td [ id "hello" ] [ text row.command ]
         ]
@@ -224,7 +241,7 @@ httpRequestShellHistoryWithSearch querystr =
 
 
 type alias ShellHistoryRow =
-    { starttime : Time.Posix
+    { timestamp : Time.Posix
     , command : String
     , cwd : String
     }
@@ -247,7 +264,7 @@ shellHistoryDecoder =
 shellHistoryRowDecoder : Decoder ShellHistoryRow
 shellHistoryRowDecoder =
     map3 ShellHistoryRow
-        (field "starttime" decodePosixTime)
+        (field "timestamp" decodePosixTime)
         (field "command" string)
         (field "cwd" string)
 

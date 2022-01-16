@@ -55,6 +55,9 @@ def c2c_ash_collector_0_0_1(collection_object):
   commonvector['pwd'] = collection_object['cwd']
 
   # timestamp is not in this version
+  if collection_object.has_key('starttime')
+      print("using starttime from source")
+      commonvector['timestamp'] = collection_object['starttime']
   commonvector['timestamp'] = int(time.time())
   return commonvector
 
