@@ -8,6 +8,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http exposing (..)
 import Json.Decode exposing (..)
+import Json.Encode
 import String exposing (..)
 import Task exposing (perform)
 import Time exposing (..)
@@ -34,7 +35,8 @@ type alias Model =
     { debugBreadcrumb : String
     , gitStatus : String
     , rows : List ShellHistoryRow
-    , searchquerystring : String
+    , pwdsearchquerystring : String
+    , commandsearchquerystring : String
     , searchsizeint : Int
     , localtimezone : Zone
     , searchquerytypeandchecked : Bool
@@ -47,6 +49,7 @@ initModel =
         "dummy debug"
         "dummy status"
         []
+        ""
         ""
         -- querystring
         10
@@ -79,7 +82,8 @@ type Msg
     = Hello Int
     | ReceivedShellHistory (Result Http.Error (List ShellHistoryRow))
     | SearchButtonClicked
-    | SearchInputHappened String
+    | PwdSearchInputHappened String
+    | CommandSearchInputHappened String
     | SearchSizeInputHappened String
     | SearchQueryTypeANDCheckedHappened Bool
     | SearchQueryTypeORCheckedHappened Bool
@@ -105,8 +109,11 @@ update msg model =
         SearchButtonClicked ->
             ( model, Cmd.batch [ httpRequestShellHistoryWithSearch model ] )
 
-        SearchInputHappened str ->
-            ( { model | searchquerystring = str }, Cmd.none )
+        CommandSearchInputHappened str ->
+            ( { model | commandsearchquerystring = str }, Cmd.none )
+
+        PwdSearchInputHappened str ->
+            ( { model | pwdsearchquerystring = str }, Cmd.none )
 
         SearchSizeInputHappened str ->
             ( { model
@@ -199,7 +206,7 @@ renderPwdSearch model =
     div []
                 [
                  span [] [text "pwd"]
-                , input [ onInput SearchInputHappened ] []
+                , input [ onInput PwdSearchInputHappened ] []
                 , button [ onClick SearchButtonClicked ] [ text "search" ]
 
                 ]
@@ -209,7 +216,7 @@ renderCommandSearch model =
     div []
                 [
                   span [] [text "command"]
-                , input [ onInput SearchInputHappened ] []
+                , input [ onInput CommandSearchInputHappened ] []
                 , button [ onClick SearchButtonClicked ] [ text "search" ]
                 ]
 
@@ -284,15 +291,17 @@ view model =
 httpRequestShellHistoryWithSearch : Model -> Cmd Msg
 httpRequestShellHistoryWithSearch model =
     let
-        jsonBody =
-               "{ \"searchquery\" : \"" ++ model.searchquerystring ++ "\""
-            ++ ","
-            ++ "\"this is hard\" : \"yep\" "
-            ++ "}"
+        actualjsonBody =
+            Json.Encode.object
+            [
+            ("pwdsearchquery", Json.Encode.string model.pwdsearchquerystring)
+            ,("commandsearchquery", Json.Encode.string model.commandsearchquerystring)
+            ]
+
     in
     Http.post
         { body =
-            Http.stringBody "application/json" jsonBody
+            Http.jsonBody actualjsonBody
         , url = "http://localhost:9999/api/shellhistory"
         , expect = Http.expectJson ReceivedShellHistory shellHistoryDecoder
         }

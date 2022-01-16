@@ -1,13 +1,15 @@
 package main
 
 import (
-	"encoding/json"
+// 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os/exec"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
+
+	"io/ioutil"
 )
 
 var debug = false
@@ -47,22 +49,29 @@ func firefoxHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.
 
 func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
-	var shellHistoryRequest ShellHistoryRequest
-	err := json.NewDecoder(r.Body).Decode(&shellHistoryRequest)
-	if err != nil {
-		fmt.Println("Error decoding shell history request")
-	}
+// 	var shellHistoryRequest ShellHistoryRequest
+// 	err := json.NewDecoder(r.Body).Decode(&shellHistoryRequest)
+// 	if err != nil {
+// 		fmt.Println("Error decoding shell history request")
+// 	}
 
-	fmt.Printf("The search query is %s\n", shellHistoryRequest.SearchQuery)
+// 	fmt.Printf("The search query is %s\n", shellHistoryRequest.SearchQuery)
+
+	body, _ := ioutil.ReadAll(r.Body)
+	fmt.Printf("The WHOLE BODY IS  is %s\n", string(body))
 
 	command := "/usr/bin/context-tracker/ash-collector-request.py"
-
 	var stdout string
-	if shellHistoryRequest.SearchQuery != "" {
-		stdout = shellout_onearg(command, shellHistoryRequest.SearchQuery)
-	} else {
-		stdout = shellout(command)
-	}
+
+		stdout = shellout_onearg(command, string(body))
+
+
+// 	var stdout string
+// 	if shellHistoryRequest.SearchQuery != "" {
+// 		stdout = shellout_onearg(command, string(body))
+// 	} else {
+// 		stdout = shellout(command)
+// 	}
 
 	fmt.Printf("The command is %s\n", command)
 	fmt.Printf("The stdout is %s\n", stdout)
