@@ -42,18 +42,8 @@ type alias Model =
     }
 
 
-
--- INIT
-
-
-dummyPosixTime =
-    Time.millisToPosix 0
-
-
-init : () -> ( Model, Cmd Msg )
-init _ =
-    -- The initial model comes from a Request, now it is hard coded
-    ( Model
+initModel =
+    Model
         "dummy debug"
         "dummy status"
         []
@@ -65,7 +55,19 @@ init _ =
         False
         False
       --zone
-    , Cmd.batch [ httpRequestShellHistoryWithSearch "", getLocalTimeZone ]
+
+-- INIT
+
+
+dummyPosixTime =
+    Time.millisToPosix 0
+
+
+init : () -> ( Model, Cmd Msg )
+init _ =
+    -- The initial model comes from a Request, now it is hard coded
+    ( initModel
+    , Cmd.batch [ httpRequestShellHistoryWithSearch initModel, getLocalTimeZone ]
     )
 
 
@@ -101,7 +103,7 @@ update msg model =
                     ( { model | rows = [ ShellHistoryRow dummyPosixTime "failtoparse" (errorToString e) ] }, Cmd.none )
 
         SearchButtonClicked ->
-            ( model, Cmd.batch [ httpRequestShellHistoryWithSearch model.searchquerystring ] )
+            ( model, Cmd.batch [ httpRequestShellHistoryWithSearch model ] )
 
         SearchInputHappened str ->
             ( { model | searchquerystring = str }, Cmd.none )
@@ -279,13 +281,14 @@ view model =
 
 -- HTTP
 
-httpRequestShellHistoryWithSearch : String -> Cmd Msg
-httpRequestShellHistoryWithSearch querystr =
+httpRequestShellHistoryWithSearch : Model -> Cmd Msg
+httpRequestShellHistoryWithSearch model =
     let
         jsonBody =
-            "{ \"searchquery\" : \""
-                ++ querystr
-                ++ "\"}"
+               "{ \"searchquery\" : \"" ++ model.searchquerystring ++ "\""
+            ++ ","
+            ++ "\"this is hard\" : \"yep\" "
+            ++ "}"
     in
     Http.post
         { body =
