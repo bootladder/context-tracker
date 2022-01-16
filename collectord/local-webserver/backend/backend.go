@@ -86,6 +86,7 @@ func shellout(str string) string {
 
 	if err != nil {
 		fmt.Println(err.Error())
+        fmt.Println(string(stdout))
 		return "fail to shellout" + str
 	}
 
@@ -98,6 +99,7 @@ func shellout_onearg(str string, arg string) string {
 
 	if err != nil {
 		fmt.Println(err.Error())
+		fmt.Println(string(stdout))
 		return "fail to shellout: " + err.Error()
 	}
 
