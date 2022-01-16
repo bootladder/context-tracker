@@ -9,13 +9,10 @@ import sys
 from pymongo import MongoClient
 from bson import json_util
 
-# CHECK ARGS
+# CHECK ARGS (first arg is search query TODO NO)
 searchquery = ""
 if len(sys.argv) > 1:
   searchquery = sys.argv[1]
-else:
-  print("not enough args supplied. quit")
-  sys.exit(1)
 
 # CONNECT TO MONGODB
 try:

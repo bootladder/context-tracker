@@ -178,21 +178,24 @@ renderShellHistoryTable rows zone =
             (List.map (\row -> renderShellHistoryRow row zone) rows )
         ]
 
+renderPwdSearch: Model -> Html Msg
+renderPwdSearch model =
+    div []
+                [ input [ onInput SearchInputHappened ] []
+                , button [ onClick SearchButtonClicked ] [ text "search" ]
+                , span [] [ text "spacer" ]
+                , button [] [ text "<" ]
+                , span [] [ text "10/20" ]
+                , button [] [ text ">" ]
+                , span [] [ text "spacer" ]
+                , input [ onInput SearchSizeInputHappened, Html.Attributes.value <| toString model.searchsizeint ] []
+                ]
 
 renderHeader : Model -> Html Msg
 renderHeader model =
     div []
         [ h2 [] [ text "Shell History" ]
-        , div []
-            [ input [ onInput SearchInputHappened ] []
-            , button [ onClick SearchButtonClicked ] [ text "search" ]
-            , span [] [ text "spacer" ]
-            , button [] [ text "<" ]
-            , span [] [ text "10/20" ]
-            , button [] [ text ">" ]
-            , span [] [ text "spacer" ]
-            , input [ onInput SearchSizeInputHappened, Html.Attributes.value <| toString model.searchsizeint ] []
-            ]
+        , renderPwdSearch model
         ]
 
 
@@ -216,9 +219,13 @@ view model =
 
 httpRequestShellHistory : Cmd Msg
 httpRequestShellHistory =
+    let
+        jsonBody =
+            "{ \"searchquery\" : \"" ++ "\"}"
+    in
     Http.post
         { body =
-            Http.stringBody "application/json" "wtf"
+            Http.stringBody "application/json" jsonBody
         , url = "http://localhost:9999/api/shellhistory"
         , expect = Http.expectJson ReceivedShellHistory shellHistoryDecoder
         }
