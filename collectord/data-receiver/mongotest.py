@@ -54,3 +54,13 @@ print("\n\n\n\blalbhalah\n\n\n\n")
 betterresults = collection.find({"source":"firefox_collector_daemon.py"})
 for results in betterresults:
     print(results)
+print("\n\n\n\blalbhalah\n\n\n\n")
+
+betterresults = collection.find({"source":"ash_collector_daemon.py"}).limit(100)
+for results in betterresults:
+    print(results)
+
+
+betterresults = collection.find({}).limit(100)
+for results in betterresults:
+    print(results)

@@ -2,12 +2,11 @@
 
 # frontend wants a list of rows
 
-from pymongo import MongoClient
+import mongoconnector
 from bson import json_util
 
-client = MongoClient("bootladder.com:9017")
-db = client['steve_context_tracker']
-collection = db["common_vectors"]
+# CONNECT TO MONGODB
+collection = mongoconnector.connect_and_return_collection()
 
 resultslist = []
 
