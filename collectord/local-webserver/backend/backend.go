@@ -128,7 +128,8 @@ func shellout_with_string_to_stdin(command string, stdindata string) string {
         fmt.Println("SHELLOUT STDIN FAIL")
     }
 //     stdout, _ := p.Output()
-    fmt.Println("wtf")
+    fmt.Println("wtf OUT STRING IS")
+    fmt.Println(out.String())
     return out.String()
 }
 

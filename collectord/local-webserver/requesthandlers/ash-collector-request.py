@@ -6,9 +6,9 @@
 # ONLY PRINT THE RESPONSE JSON !!!!
 
 import sys
-from pymongo import MongoClient
 from bson import json_util
 import json
+import mongoconnector
 
 # CHECK ARGS (first arg is search query TODO NO)
 # print(sys.argv[1])
@@ -19,18 +19,12 @@ import json
 
 
 data = sys.stdin.readlines()[0]
-print(data)
+# print(data)
 requestobject = json.loads(data)
 # print(requestobject)
 
 # CONNECT TO MONGODB
-try:
-  client = MongoClient("bootladder.com:9017")
-  db = client['steve_context_tracker']
-  collection = db["common_vectors"]
-except Exception as e:
-  print("fail to connect to mongodb")
-  print(e)
+collection = mongoconnector.connect_and_return_collection()
 
 # QUERY THE DB
 try:
