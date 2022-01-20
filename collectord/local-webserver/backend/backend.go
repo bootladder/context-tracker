@@ -123,9 +123,13 @@ func shellout_with_string_to_stdin(command string, stdindata string) string {
     p.Stdin = strings.NewReader(stdindata)
     var out bytes.Buffer
     p.Stdout = &out
+    var stderror bytes.Buffer
+    p.Stderr = &stderror
     err := p.Run()
     if err != nil {
         fmt.Println("SHELLOUT STDIN FAIL")
+        fmt.Println(stderror.String())
+
     }
 //     stdout, _ := p.Output()
     fmt.Println("wtf OUT STRING IS")
