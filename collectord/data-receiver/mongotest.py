@@ -2,7 +2,8 @@
 
 from pymongo import MongoClient
 
-client = MongoClient("bootladder.com:9017")
+mongourl = "blahurl:1017"
+client = MongoClient(mongourl)
 
 a = client.server_info()
 print(a)

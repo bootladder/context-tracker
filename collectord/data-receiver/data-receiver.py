@@ -39,11 +39,9 @@ common_vector_version = '0.0.1'
 # print("connected to local db")
 
 # connect to central db
-from pymongo import MongoClient
-centraldbclient = MongoClient("bootladder.com:9017")
-db = centraldbclient['steve_context_tracker']
-collection = db["common_vectors"]
-print("connected to central db")
+import mongoconnector
+collection = mongoconnector.connect_and_return_collection()
+
 
 def c2c_ash_collector_0_0_1(collection_object):
   print("watffff")
