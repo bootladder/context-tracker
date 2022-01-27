@@ -27,16 +27,16 @@ import sys
 socket = 0  #zmq socket
 
 common_vector_version = '0.0.1'
-
-# connect to local db
-path_to_commonvector_db = "/home/*/.context-tracker/commonvector.db"
-globresult = glob.glob(path_to_commonvector_db)
-if len(globresult) != 1:
-  print("wtf too many globs")
-  sys.exit(1)
-dbfilename = globresult[0]
-conn = sqlite3.connect(dbfilename)
-print("connected to local db")
+#
+# # connect to local db
+# path_to_commonvector_db = "/home/*/.context-tracker/commonvector.db"
+# globresult = glob.glob(path_to_commonvector_db)
+# if len(globresult) != 1:
+#   print("wtf too many globs")
+#   sys.exit(1)
+# dbfilename = globresult[0]
+# conn = sqlite3.connect(dbfilename)
+# print("connected to local db")
 
 # connect to central db
 from pymongo import MongoClient
@@ -55,7 +55,7 @@ def c2c_ash_collector_0_0_1(collection_object):
   commonvector['pwd'] = collection_object['cwd']
 
   # timestamp is not in this version
-  if collection_object.has_key('starttime')
+  if collection_object.has_key('starttime'):
       print("using starttime from source")
       commonvector['timestamp'] = collection_object['starttime']
   commonvector['timestamp'] = int(time.time())
@@ -111,15 +111,15 @@ def convert_to_common_vector(collection_object):
 
 def insert_common_vector_into_local_storage(vector):
     print("insert_common_vector_into_local_storage")
-    try:
-        print("clearly sqlite local storage is flawed because")
-        print("excessive maintenance of common vector schema")
-        # rowlist = [vector['version'], vector['pwd'], vector['command']]
-        # cursor = conn.execute("INSERT INTO commonvector values (?,?,?)", rowlist)
-        # conn.commit()
-    except Exception as e:
-        print(e)
-        print("fail local storage")
+    # try:
+    #     print("clearly sqlite local storage is flawed because")
+    #     print("excessive maintenance of common vector schema")
+    #     # rowlist = [vector['version'], vector['pwd'], vector['command']]
+    #     # cursor = conn.execute("INSERT INTO commonvector values (?,?,?)", rowlist)
+    #     # conn.commit()
+    # except Exception as e:
+    #     print(e)
+    #     print("fail local storage")
 
 def insert_common_vector_into_central_storage(vector):
     print("insert_common_vector_into_central_storage")

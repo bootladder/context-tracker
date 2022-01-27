@@ -25,7 +25,8 @@ socket = collectord_messagequeue.start_client()
 searchquery = ""
 
 
-path_to_ash_db = "/home/*/.ash/history.db"
+# path_to_ash_db = "/home/*/.ash/history.db"
+path_to_ash_db = "/ash/history.db"
 shadow_db_location = "/tmp/ashshadow.sqlite"
 
 # Get the path to the user's ASH database

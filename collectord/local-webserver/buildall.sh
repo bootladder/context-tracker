@@ -1,7 +1,10 @@
+#!/bin/bash
+set -x
+
 ## TODO Test for dependency requirements
 ## TODO Test for existence of correct directories
 #
-#!/bin/bash
+
 #
 # Install Dependencies
 #

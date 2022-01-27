@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 
 # Frontend wants a list of rows containing shell history
 # By default it will be the last 10 entries
@@ -6,6 +6,7 @@
 # Input is JSON to stdin
 # Output is JSON to stdout
 
+print("what the fuck 123")
 import sys
 from bson import json_util
 import json

@@ -16,6 +16,9 @@ import (
 
 var debug = false
 
+var pathToFrontend = "./frontend"
+var pathToRequestHandlers = "./requesthandlers"
+
 type ShellHistoryRequest struct {
 	SearchQuery string
 }
@@ -25,7 +28,7 @@ func main() {
 	router := httprouter.New()
 
 	// Serve the Frontend
-	router.ServeFiles("/*filepath", http.Dir("../frontend"))
+	router.ServeFiles("/*filepath", http.Dir(pathToFrontend))
 
 	// Serve the API
 	router.POST("/api/", gitStatusHandler)
@@ -44,7 +47,7 @@ func jsonHttpResponse(w http.ResponseWriter, body string) {
 }
 
 func firefoxHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	stdout := shellout("/usr/bin/context-tracker/firefox-collector-request.py")
+	stdout := shellout(pathToRequestHandlers+"/firefox-collector-request.py")
 	fmt.Println("firefox stdout got")
 	jsonHttpResponse(w, stdout)
 }
@@ -62,7 +65,7 @@ func shellHistoryHandler(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 	body, _ := ioutil.ReadAll(r.Body)
 	fmt.Printf("The WHOLE BODY IS  is %s\n", string(body))
 
-	command := "/usr/bin/context-tracker/ash-collector-request.py"
+	command := pathToRequestHandlers+"/ash-collector-request.py"
 	var stdout string
 
 		stdout = shellout_with_string_to_stdin(command, string(body))
@@ -128,6 +131,7 @@ func shellout_with_string_to_stdin(command string, stdindata string) string {
     err := p.Run()
     if err != nil {
         fmt.Println("SHELLOUT STDIN FAIL")
+        fmt.Println(err.Error())
         fmt.Println(stderror.String())
 
     }
