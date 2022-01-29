@@ -17,7 +17,6 @@
 #
 import time
 import json
-import jsonlines
 import zmq
 import glob
 import sqlite3
@@ -51,9 +50,10 @@ def c2c_ash_collector_0_0_1(collection_object):
   commonvector['sourceversion'] = collection_object['version']
   commonvector['command'] = collection_object['command']
   commonvector['pwd'] = collection_object['cwd']
+  print("2222222222")
 
   # timestamp is not in this version
-  if collection_object.has_key('starttime'):
+  if 'starttime' not in collection_object:
       print("using starttime from source")
       commonvector['timestamp'] = collection_object['starttime']
   commonvector['timestamp'] = int(time.time())
@@ -100,9 +100,15 @@ def convert_to_common_vector(collection_object):
       conversion_func = conversion_funcs[data_source][data_version]
       vector = conversion_func(collection_object)
   except Exception as e:
+      print(e)
       print("no conversion function defined for incoming data")
       print("this is the collection_object")
       print(collection_object)
+      print("source is : " , collection_object['source'])
+      print("version is : " , collection_object['version'])
+      print(conversion_funcs)
+      print(conversion_funcs[data_source])
+      print(conversion_funcs[data_source][data_version])
 
   return vector
 
@@ -131,9 +137,13 @@ def insert_common_vector_into_central_storage(vector):
 
 
 def main():
+  print("DATA RECEIVER STARTING")
+  sys.stdout.flush()
   setup_zmq_socket()
 
   while True:
+      sys.stdout.flush()
+
       #  Wait for any collectors to send data
       message = socket.recv()
       print("\n\nData Collector: Received msg.")

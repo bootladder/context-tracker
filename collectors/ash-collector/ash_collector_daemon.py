@@ -64,9 +64,12 @@ def process_new_ash_row_and_send_to_data_receiver(row):
   collectord_messagequeue.send_message(socket, jsondump)
 
 
+print("ASH COLLECTOR DAEMON")
+
 while True:
 
   print("sleep")
+  sys.stdout.flush()
   time.sleep(5.0)
 
   # Get the Rows
