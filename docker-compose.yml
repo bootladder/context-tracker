@@ -18,6 +18,8 @@ services:
     ports:
       - "9999:9999"
 
+# ASH collector requires access to the SQLite database
+# which is in the home directory .ash
   ash-collector-daemon:
     container_name: ash-collector-daemon
     build: collectors/ash-collector
@@ -25,7 +27,9 @@ services:
     volumes:
       - /home/steve/.ash:/ash
 
-#  firefox-collector-daemon:
-#    container_name: firefox-collector-daemon
-#    build: collectors/firefox-collector
-#    network_mode: "host"
+  firefox-collector-daemon:
+    container_name: firefox-collector-daemon
+    build: collectors/firefox-collector
+    network_mode: "host"
+    volumes:
+      - /home/steve/.mozilla:/home/steve/.mozilla

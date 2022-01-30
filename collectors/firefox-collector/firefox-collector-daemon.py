@@ -27,6 +27,7 @@ import time
 
 def main():
   print("Hello World!")
+  sys.stdout.flush()
 
 
   # Setup collectord messagequeue to send JSON to
@@ -37,6 +38,7 @@ def main():
   except e:
     print("fail catch")
 
+  sys.stdout.flush()
   dbfilename = get_exact_path_to_firefox_sqlite()
 
 
@@ -60,6 +62,7 @@ def main():
 
   while True:
     print("firefox-collector-daemon.py top loop sleep")
+    sys.stdout.flush()
     time.sleep(2.0)
 
     #copy the database because firefox locks it
