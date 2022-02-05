@@ -20,7 +20,7 @@ USER localwebserver
 run echo whoami
 run whoami
 run echo what the hell
-run sudo echo what htehll sudo
+#run sudo echo what htehll sudo
 WORKDIR /home/localwebserver
 
 

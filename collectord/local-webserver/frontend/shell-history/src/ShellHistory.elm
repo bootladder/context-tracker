@@ -14,6 +14,7 @@ import Task exposing (perform)
 import Time exposing (..)
 
 
+versionstring = "hello1"
 
 -- MAIN
 
@@ -41,6 +42,8 @@ type alias Model =
     , localtimezone : Zone
     , searchquerytypeandchecked : Bool
     , searchquerytypeorchecked : Bool
+    , searchquerytimestampearliest: Int
+    , searchquerytimestamplatest: Int
     }
 
 
@@ -57,6 +60,8 @@ initModel =
         utc
         False
         False
+        0
+        0
       --zone
 
 -- INIT
@@ -263,7 +268,7 @@ renderPaginator model =
 renderHeader : Model -> Html Msg
 renderHeader model =
     div []
-        [ h2 [] [ text "Shell History" ]
+        [ h2 [] [ text ("Shell History: Version " ++ versionstring) ]
         , renderPwdSearch model
         , renderCommandSearch model
         , renderQueryTypeSelector model
@@ -288,18 +293,25 @@ view model =
 
 -- HTTP
 
-httpRequestShellHistoryWithSearch : Model -> Cmd Msg
-httpRequestShellHistoryWithSearch model =
-    let
-        actualjsonBody =
-            Json.Encode.object
+createRequestJsonBodyFromModel : Model -> Json.Encode.Value
+createRequestJsonBodyFromModel model =
+    Json.Encode.object
             [
             ("pwdsearchquery", Json.Encode.string model.pwdsearchquerystring)
             ,("commandsearchquery", Json.Encode.string model.commandsearchquerystring)
             ,("searchquerytypeandchecked", Json.Encode.bool model.searchquerytypeandchecked)
             ,("searchquerytypeorchecked", Json.Encode.bool model.searchquerytypeorchecked)
             ,("searchsize", Json.Encode.int model.searchsizeint)
+            ,("timestampearliest", Json.Encode.int model.searchquerytimestampearliest)
+            ,("timestamplatest", Json.Encode.int model.searchquerytimestamplatest)
             ]
+
+httpRequestShellHistoryWithSearch : Model -> Cmd Msg
+httpRequestShellHistoryWithSearch model =
+    let
+        actualjsonBody =
+            createRequestJsonBodyFromModel model
+
 
     in
     Http.post

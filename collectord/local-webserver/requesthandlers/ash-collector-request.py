@@ -6,12 +6,10 @@
 # Input is JSON to stdin
 # Output is JSON to stdout
 
-print("what the fuck 123")
 import sys
 from bson import json_util
 import json
 import mongoconnector
-
 
 # Check STDIN
 data = sys.stdin.readlines()[0]
