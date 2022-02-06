@@ -17,6 +17,13 @@ services:
     build: collectord/local-webserver
     ports:
       - "9999:9999"
+    volumes:
+        - /opt/projects/context-tracker/collectord/local-webserver/frontend:/home/localwebserver/frontend
+        - /opt/projects/context-tracker/collectord/local-webserver/backend:/home/localwebserver/backend
+        - /opt/projects/context-tracker/collectord/local-webserver/requesthandlers:/home/localwebserver/requesthandlers
+        - /opt/projects/context-tracker/collectord/local-webserver/mongocollectionname.txt:/home/localwebserver/mongocollectionname.txt
+        - /opt/projects/context-tracker/collectord/local-webserver/mongodbname.txt:/home/localwebserver/mongodbname.txt
+        - /opt/projects/context-tracker/collectord/local-webserver/mongourl.txt:/home/localwebserver/mongourl.txt
 
 # ASH collector requires access to the SQLite database
 # which is in the home directory .ash

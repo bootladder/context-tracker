@@ -32,7 +32,11 @@ run pip install --no-cache-dir zmq glob2 pysqlite3 pymongo
 
 # Copy everything in the source build directory, into the image,
 # at the workdir, /home/localwebserver
-COPY . .
+
+
+# NO, VOLUMING MAPING IT IN
+# COPY . .
+
 
 
 

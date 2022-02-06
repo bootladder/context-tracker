@@ -44,6 +44,7 @@ type alias Model =
     , searchquerytypeorchecked : Bool
     , searchquerytimestampearliest: Int
     , searchquerytimestamplatest: Int
+    , searchquerypwdrequired: Bool
     }
 
 
@@ -62,6 +63,7 @@ initModel =
         False
         0
         0
+        False
       --zone
 
 -- INIT
@@ -93,6 +95,7 @@ type Msg
     | SearchQueryTypeANDCheckedHappened Bool
     | SearchQueryTypeORCheckedHappened Bool
     | GotTimeZone Zone
+    | PwdRequiredOnCheck Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -140,6 +143,9 @@ update msg model =
         SearchQueryTypeORCheckedHappened b ->
             ( {model | searchquerytypeorchecked = b}
             ,Cmd.none)
+
+        PwdRequiredOnCheck b ->
+            ( {model | searchquerypwdrequired = b} , Cmd.none)
 
         GotTimeZone z ->
             ( { model | localtimezone = z }, Cmd.none )
@@ -209,12 +215,13 @@ renderShellHistoryTable rows zone =
 renderPwdSearch: Model -> Html Msg
 renderPwdSearch model =
     div []
-                [
-                 span [] [text "pwd"]
-                , input [ onInput PwdSearchInputHappened ] []
-                , button [ onClick SearchButtonClicked ] [ text "search" ]
+        [
+         span [] [text "pwd"]
+        , input [ onInput PwdSearchInputHappened ] []
+        , span [] [text "Required"]
+         ,input [ type_ "checkbox", onCheck PwdRequiredOnCheck] []
 
-                ]
+        ]
 
 renderCommandSearch: Model -> Html Msg
 renderCommandSearch model =
@@ -297,10 +304,8 @@ createRequestJsonBodyFromModel : Model -> Json.Encode.Value
 createRequestJsonBodyFromModel model =
     Json.Encode.object
             [
-            ("pwdsearchquery", Json.Encode.string model.pwdsearchquerystring)
-            ,("commandsearchquery", Json.Encode.string model.commandsearchquerystring)
-            ,("searchquerytypeandchecked", Json.Encode.bool model.searchquerytypeandchecked)
-            ,("searchquerytypeorchecked", Json.Encode.bool model.searchquerytypeorchecked)
+            ("pwd", Json.Encode.string model.pwdsearchquerystring)
+            ,("command", Json.Encode.string model.commandsearchquerystring)
             ,("searchsize", Json.Encode.int model.searchsizeint)
             ,("timestampearliest", Json.Encode.int model.searchquerytimestampearliest)
             ,("timestamplatest", Json.Encode.int model.searchquerytimestamplatest)
