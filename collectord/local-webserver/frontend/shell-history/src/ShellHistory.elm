@@ -309,6 +309,8 @@ createRequestJsonBodyFromModel model =
             ,("searchsize", Json.Encode.int model.searchsizeint)
             ,("timestampearliest", Json.Encode.int model.searchquerytimestampearliest)
             ,("timestamplatest", Json.Encode.int model.searchquerytimestamplatest)
+            ,("commandrequired", Json.Encode.bool True)
+            ,("pwdrequired", Json.Encode.bool True)
             ]
 
 httpRequestShellHistoryWithSearch : Model -> Cmd Msg

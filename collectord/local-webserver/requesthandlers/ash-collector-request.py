@@ -30,10 +30,8 @@ def main():
 
 
 def process_request_object(requestobject):
-  # CONNECT TO MONGODB
-  collection = mongoconnector.connect_and_return_collection()
 
-  # QUERY THE DB
+  # CONSTRUCT THE QUERY FROM THE REQUEST OBJECT
   try:
 
     commandquery = {}
@@ -47,36 +45,36 @@ def process_request_object(requestobject):
             requestobject['pwd'] != "":
       pwdquery = {"pwd": {"$regex":".*%s.*"%(requestobject['pwd'])}}
 
+
+    and_queries = []
+    or_queries = []
+
+    # source is always required
+    and_queries.append( {"source":"ash_collector_daemon.py"} )
+
+    if 'commandrequired' in requestobject:
+      and_queries.append(commandquery)
+    else:
+      or_queries.append(commandquery)
+
+    if 'pwdrequired' in requestobject:
+      and_queries.append(pwdquery)
+    else:
+      or_queries.append(pwdquery)
+
     entire_query_object = \
       {
         "$and":
           [
-            {"source":"ash_collector_daemon.py"}
+            {"$and": and_queries}
             ,
-            {
-              "$or":
-                [
-                  commandquery
-                  ,pwdquery
-                ]
-            }
+            { "$or": or_queries }
           ]
       }
 
-    # print(entire_query_object)
+    print(entire_query_object)
 
-    resultslist = []
-    betterresults = collection.find(
-      entire_query_object
-    ) \
-      .limit(10)
-
-    for result in betterresults:
-      #  KLUDGE VALIDATE THIS DATA CLEAN THE DAMN DATA
-      if 'timestamp' not in result:
-        result['timestamp'] = 0
-      resultslist.append(result)
-      # print(result)
+    resultslist = run_the_query(entire_query_object)
 
   except Exception as e:
     print("fail to query db")
@@ -95,14 +93,42 @@ def process_request_object(requestobject):
 
 
 
+def run_the_query(entire_query_object):
+
+  # CONNECT TO MONGODB
+  collection = mongoconnector.connect_and_return_collection()
+
+
+  resultslist = []
+  betterresults = collection.find(
+    entire_query_object
+  ) \
+    .limit(10)
+
+  for result in betterresults:
+    #  KLUDGE VALIDATE THIS DATA CLEAN THE DAMN DATA
+    if 'timestamp' not in result:
+      result['timestamp'] = 0
+    resultslist.append(result)
+
+    # FOR TESTING
+    print(result)
+
+  return resultslist
+
+
 def run_test():
   requestobject = dict()
   requestobject['command'] = "ssh"
-  requestobject['pwd'] = "opt"
-
+  requestobject['pwd'] = "home"
   process_request_object(requestobject)
 
+  # requestobject = {'$and': [{'$and': [{'source': 'ash_collector_daemon.py'}]}, {'$or': [{'command': {'$regex': '.*gszzz.*'}}, {'pwd': {'$regex': '.*szteve.*'}}]}]}
+  # run_the_query(requestobject)
+  print("wat popy")
+
 if __name__ == "__main__":
-  main()
-  # run_test()
-  # print("wat popy")
+  if True:
+    main()
+  else:
+    run_test()
