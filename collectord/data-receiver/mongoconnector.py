@@ -4,17 +4,17 @@ import os
 
 mongourl = ""
 with open('mongourl.txt') as f:
-    mongourl = f.read()
+    mongourl = f.readline().strip()
 
 mongodbname = ""
 with open('mongodbname.txt') as f:
-    mongodbname = f.read()
+    mongodbname = f.readline().strip()
 
 mongocollectionname = ""
 with open('mongocollectionname.txt') as f:
-    mongocollectionname = f.read()
+    mongocollectionname = f.readline().strip()
 
-
+print(f"Connecting to db...\nurl: {mongourl} dbname: {mongodbname} collectionname: {mongocollectionname}")
 # ""
 # ''
 # ""

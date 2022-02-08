@@ -40,7 +40,7 @@ common_vector_version = '0.0.1'
 # connect to central db
 import mongoconnector
 collection = mongoconnector.connect_and_return_collection()
-
+print("Connected to central db")
 
 def c2c_ash_collector_0_0_1(collection_object):
   print("watffff")
@@ -58,6 +58,7 @@ def c2c_ash_collector_0_0_1(collection_object):
       commonvector['timestamp'] = collection_object['starttime']
   commonvector['timestamp'] = int(time.time())
   return commonvector
+
 
 def c2c_firefox_collector_0_0_1(collection_object):
     print("c2c firefox 0 0 1")
@@ -79,12 +80,26 @@ def c2c_firefox_collector_0_0_1(collection_object):
     print("c2c OK")
     return commonvector
 
+
+def c2c_zsh_collector_0_0_1(collection_object) -> dict:
+  print("c2c zsh collector 0 0 1")
+  return {'version': common_vector_version,
+          'source': collection_object['source'],
+          'sourceversion' : collection_object['version'],
+          'command' : collection_object['command'],
+          'pwd' : collection_object['directory'],
+          'timestamp': collection_object['timestamp']}
+
+
 # Table of conversions
 conversion_funcs = dict()
 conversion_funcs['ash_collector_daemon.py'] = dict()
 conversion_funcs['ash_collector_daemon.py']['0.0.1'] = c2c_ash_collector_0_0_1
 conversion_funcs['firefox_collector_daemon.py'] = dict()
 conversion_funcs['firefox_collector_daemon.py']['0.0.1'] = c2c_firefox_collector_0_0_1
+conversion_funcs['zsh_collector_daemon.py'] = dict()
+conversion_funcs['zsh_collector_daemon.py']['0.0.1'] = c2c_zsh_collector_0_0_1
+
 
 
 def convert_to_common_vector(collection_object):
@@ -156,7 +171,7 @@ def main():
         print(commonvector)
         insert_common_vector_into_local_storage(commonvector)
         insert_common_vector_into_central_storage(commonvector)
-
+        print("inserted in central storage")
         #  Send reply back to client
         socket.send(b"OK")
 
@@ -167,10 +182,12 @@ def main():
 
 
 def setup_zmq_socket():
+  print("Setting up zmq socket at port 5555")
   global socket
   context = zmq.Context()
   socket = context.socket(zmq.REP)
   socket.bind("tcp://*:5555")
+  print("done")
 
 
 if __name__ == "__main__":
