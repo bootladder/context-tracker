@@ -34,23 +34,25 @@ def process_request_object(requestobject):
   # CONSTRUCT THE QUERY FROM THE REQUEST OBJECT
   try:
 
-    commandquery = {}
+
     if 'command' in requestobject and \
             requestobject['command'] != "":
       commandquery = {"command":{"$regex":".*%s.*"%(requestobject['command'])}}
-
-    pwdquery = {}
+    else:
+      commandquery = {}
 
     if 'pwd' in requestobject and \
             requestobject['pwd'] != "":
       pwdquery = {"pwd": {"$regex":".*%s.*"%(requestobject['pwd'])}}
+    else:
+      pwdquery = {}
+
 
 
     and_queries = []
-    or_queries = []
+    or_queries = [{"failing":"initial value"}]
 
     # source is always required
-    and_queries.append( {"source":"ash_collector_daemon.py"} )
 
     if 'commandrequired' in requestobject:
       and_queries.append(commandquery)
@@ -62,17 +64,38 @@ def process_request_object(requestobject):
     else:
       or_queries.append(pwdquery)
 
+
+    if len(and_queries) == 0:
+      and_queries = [{"failing":"initial value"}]
+
     entire_query_object = \
       {
         "$and":
           [
-            {"$and": and_queries}
+            {"source":"ash_collector_daemon.py"}
             ,
-            { "$or": or_queries }
+            {
+              "$or":
+                    [
+                      {
+                        "$and": and_queries
+                      } if and_queries else {}
+                      ,
+                      {
+                        "$or": or_queries
+                      } if or_queries else {}
+                    ]
+            }
+
+
+
+            # {"$and": and_queries}
+            # ,
+            # { "$or": or_queries }
           ]
       }
 
-    print(entire_query_object)
+    # print(entire_query_object)
 
     resultslist = run_the_query(entire_query_object)
 
@@ -112,7 +135,7 @@ def run_the_query(entire_query_object):
     resultslist.append(result)
 
     # FOR TESTING
-    print(result)
+    # print(result)
 
   return resultslist
 
