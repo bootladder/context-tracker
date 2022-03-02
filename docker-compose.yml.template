@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  data-receiver:
+    container_name: data-receiver
+    build: collectord/data-receiver/
+    ports:
+      - {{ data_receiver_zmq_port }}:{{ data_receiver_zmq_port }}
+    environment:
+      - data_receiver_zmq_port={{ data_receiver_zmq_port }}
+
+# Golang backend
+# Elm frontend
+# no need to build in the container
+# just give the binary to the container
+# and the main.js
+  local-webserver:
+    container_name: local-webserver
+    build: collectord/local-webserver
+    network_mode: "host"
+    ports:
+      - "9999:9999"
+    volumes:
+        - {{ context_tracker_root_path }}:/home/localwebserver/frontend
+        - {{ context_tracker_root_path }}:/home/localwebserver/backend
+        - {{ context_tracker_root_path }}:/home/localwebserver/requesthandlers
+        - {{ context_tracker_root_path }}:/home/localwebserver/mongocollectionname.txt
+        - {{ context_tracker_root_path }}:/home/localwebserver/mongodbname.txt
+        - {{ context_tracker_root_path }}:/home/localwebserver/mongourl.txt
+
+
+{% if ash_collector_enabled %}
+# ASH collector requires access to the SQLite database
+# which is in the home directory .ash
+ash-collector-daemon:
+   container_name: ash-collector-daemon
+   build: collectors/ash-collector
+   network_mode: "host"
+   volumes:
+     {{ ash_collector_db_path }}:/ash
+   environment:
+      - data_receiver_zmq_port={{ data_receiver_zmq_port }}
+{% endif %}
+
+{% if firefox_collector_enabled %}
+  firefox-collector-daemon:
+    container_name: firefox-collector-daemon
+    build: collectors/firefox-collector
+    network_mode: "host"
+    volumes:
+      - {{ firefox_profile_path }}:{{ firefox_profile_path }}
+    environment:
+      - data_receiver_zmq_port={{ data_receiver_zmq_port }}
+{% endif %}
+
+{% if zsh_collector_enabled %}
+  zsh-collector-daemon:
+    container_name: zsh-collector-daemon
+    build: collectors/zsh-collector
+    network_mode: "host"
+    volumes:
+      - {{ zsh_collector_db_path }}:{{ zsh_collector_db_path }}
+    environment:
+      - data_receiver_zmq_port={{ data_receiver_zmq_port }}
+{% endif %}

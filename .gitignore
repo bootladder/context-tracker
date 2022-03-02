@@ -2,3 +2,6 @@
 *.pyc
 .idea/
 collectord-local-webapp
+*/**/.txt
+docker-compose-config.yml
+docker-compose.yml
