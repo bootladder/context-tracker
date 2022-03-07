@@ -127,11 +127,12 @@ def main():
 
 
 def get_exact_path_to_firefox_sqlite():
-  path_to_firefox_history_db = "/home/*/.mozilla/firefox/*default*/places.sqlite"
+  path_to_firefox_history_db = "/home/*/.mozilla/firefox/*default-release*/places.sqlite"
 
   globresult = glob.glob(path_to_firefox_history_db)
   if len(globresult) != 1:
     print("wtf too many globs")
+    print(globresult)
     sys.exit(1)
 
   print("database is at " , globresult[0])
