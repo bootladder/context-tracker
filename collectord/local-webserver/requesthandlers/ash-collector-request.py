@@ -125,7 +125,7 @@ def run_the_query(entire_query_object):
   resultslist = []
   betterresults = collection.find(
     entire_query_object
-  ) \
+  ).sort('timestamp',-1) \
     .limit(10)
 
   for result in betterresults:

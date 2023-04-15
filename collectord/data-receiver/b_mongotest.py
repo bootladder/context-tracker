@@ -61,10 +61,55 @@ betterresults = collection.find({"source":"ash_collector_daemon.py"}).limit(100)
 for results in betterresults:
     print(results)
 
-print("PRINT ANYTHING")
+print("\n\n\n\bwatttttt\n\n\n\n")
+#
+# betterresults = collection.find({}).limit(100)
+# for results in betterresults:
+#     print(results)
+# print("\n\n\n\bwatttttt\n\n\n\n")
+# QUERY THE DB
+try:
 
-betterresults = collection.find({}).limit(100)
-for results in betterresults:
-    print(results)
 
-print("DONE")
+    # commandquery = {"command":"l"}
+    commandquery = {"command":{"$regex":".*%s.*"%("ssh")}}
+
+    # pwdquery = {}
+    # if 'pwdsearchquery' in requestobject and \
+    #         requestobject['pwdsearchquery'] != "":
+    pwdquery = {"pwd": {"$regex":".*%s.*"%("opt")}}
+
+    entire_query_object = \
+        {
+            "$and":
+                [
+                    {"source":"ash_collector_daemon.py"}
+                    # ,commandquery
+                    ,
+                    { "$or":
+                      [
+                        commandquery
+                        ,pwdquery
+                      ]
+                      }
+                ]
+
+        }
+
+    # print(entire_query_object)
+
+    resultslist = []
+    betterresults = collection.find(
+        entire_query_object
+    ) \
+        .limit(10)
+
+    for result in betterresults:
+        resultslist.append(result)
+        print(result)
+
+    # print(resultslist)
+
+except Exception as e:
+    print("fail to query db")
+    print(e)
