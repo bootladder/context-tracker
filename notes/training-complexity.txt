@@ -1,0 +1,5 @@
+if i collect eg. 10k to 1 million vectors.
+1000/day, 30 days live real data, plus historical "conversion" into common vectors
+
+can I use it to train lots of little models and combine them?
+how many vectors do i need to "tag" to produce validation sets.

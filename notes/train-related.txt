@@ -1,0 +1,14 @@
+train a model to say if 2 vectors are related, ie. same context
+then I can shift the training set and get context groups.
+assuming that all contexts are contiguous in time.
+
+how does assemblyai, chatgpt deal with arbitrary length input?
+does it pad to a fixed size ie. "context window" ?
+
+
+train a model to say if one vector has a property "working on project A"
+train a model to say if one vector has a property "working on project B"
+
+combine 2 models to get a tuple, {projectA? , projectB?}
+
+

@@ -1,0 +1,9 @@
+1259 gthumb .
+1260 l
+1259 gthumb .
+1260 l
+1259 gthumb .
+1260 l
+1423 systemctl suspend
+1424 l
+1464 vi build/constants.js
